@@ -18,7 +18,7 @@ pygame.display.set_icon(icone)
 branco = (255,255,255)
 preto = (0, 0 ,0 )
 garra = pygame.image.load("assets/garra.png")
-#fundoStart = pygame.image.load("assets/fundoStart.jpg")
+fundoStart = pygame.image.load("assets/fundoJogo.png")
 fundoJogo = pygame.image.load("assets/fundoJogo.png")
 #fundoDead = pygame.image.load("assets/fundoDead.png")
 urso = pygame.image.load("assets/ursinho.png")
@@ -63,84 +63,74 @@ def jogar():
     root.mainloop()
     
 
-    posicaoXPersona = 400
-    posicaoYPersona = 300
-    movimentoXPersona  = 0
-    movimentoYPersona  = 0
-    posicaoXMissel = 400
-    posicaoYMissel = -240
-    velocidadeMissel = 1
-    pygame.mixer.Sound.play(missileSound)
-    pygame.mixer.music.play(-1)
+    posicaoXGarra = 400
+    posicaoYGarra = 175
+    movimentoXGarra  = 0
+    movimentoYGarra  = 0
+    posicaoXUrso = 445
+    posicaoYUrso = 500
+    #pygame.mixer.Sound.play(missileSound)
+    #pygame.mixer.music.play(-1)
     pontos = 0
-    larguraPersona = 250
-    alturaPersona = 127
-    larguaMissel  = 50
-    alturaMissel  = 250
+    larguraGarra = 100
+    alturaGarra = 80
+    larguaUrso  = 75
+    alturaUrso  = 75
     dificuldade  = 30
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 quit()
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_RIGHT:
-                movimentoXPersona = 15
+                movimentoXGarra = 15
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_LEFT:
-                movimentoXPersona = -15
+                movimentoXGarra = -15
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_RIGHT:
-                movimentoXPersona = 0
+                movimentoXGarra = 0
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_LEFT:
-                movimentoXPersona = 0
+                movimentoXGarra = 0
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_UP:
-                movimentoYPersona = -15
+                movimentoYGarra = -15
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_DOWN:
-                movimentoYPersona = 15
+                movimentoYGarra = 15
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_UP:
-                movimentoYPersona = 0
+                movimentoYGarra = 0
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_DOWN:
-                movimentoYPersona = 0
+                movimentoYGarra = 0
                 
-        posicaoXPersona = posicaoXPersona + movimentoXPersona            
-        posicaoYPersona = posicaoYPersona + movimentoYPersona            
+        posicaoXGarra = posicaoXGarra + movimentoXGarra            
+        posicaoYGarra = posicaoYGarra + movimentoYGarra       
         
-        if posicaoXPersona < 0 :
-            posicaoXPersona = 15
-        elif posicaoXPersona >550:
-            posicaoXPersona = 540
+        if posicaoXGarra < 0 :
+            posicaoXGarra = 15
+        elif posicaoXGarra >550:
+            posicaoXGarra = 540
             
-        if posicaoYPersona < 0 :
-            posicaoYPersona = 15
-        elif posicaoYPersona > 473:
-            posicaoYPersona = 463
+        if posicaoYGarra < 0 :
+            posicaoYGarra = 15
+        elif posicaoYGarra > 473:
+            posicaoYGarra = 463
         
             
         tela.fill(branco)
         tela.blit(fundoJogo, (0,0) )
-        tela.blit( iron, (posicaoXPersona, posicaoYPersona) )
-        
-        posicaoYMissel = posicaoYMissel + velocidadeMissel
-        if posicaoYMissel > 600:
-            posicaoYMissel = -240
-            pontos = pontos + 1
-            velocidadeMissel = velocidadeMissel + 1
-            posicaoXMissel = random.randint(0,800)
-            pygame.mixer.Sound.play(missileSound)
+        tela.blit( garra, (posicaoXGarra, posicaoYGarra) )
             
-            
-        tela.blit( missel, (posicaoXMissel, posicaoYMissel) )
+        tela.blit( urso, (posicaoXUrso, posicaoYUrso) )
         
         texto = fonteMenu.render("Pontos: "+str(pontos), True, branco)
         tela.blit(texto, (15,15))
         
-        pixelsPersonaX = list(range(posicaoXPersona, posicaoXPersona+larguraPersona))
-        pixelsPersonaY = list(range(posicaoYPersona, posicaoYPersona+alturaPersona))
-        pixelsMisselX = list(range(posicaoXMissel, posicaoXMissel + larguaMissel))
-        pixelsMisselY = list(range(posicaoYMissel, posicaoYMissel + alturaMissel))
+        pixelsGarraX = list(range(posicaoXGarra, posicaoXGarra+larguraGarra))
+        pixelsGarraY = list(range(posicaoYGarra, posicaoYGarra+alturaGarra))
+        pixelsUrsoX = list(range(posicaoXUrso, posicaoXUrso + larguaUrso))
+        pixelsUrsoY = list(range(posicaoYUrso, posicaoYUrso + alturaUrso))
         
         os.system("cls")
         
         # print( len( list( set(pixelsMisselX).intersection(set(pixelsPersonaX))   ) )   )
-        if  len( list( set(pixelsMisselY).intersection(set(pixelsPersonaY))) ) > dificuldade:
-            if len( list( set(pixelsMisselX).intersection(set(pixelsPersonaX))   ) )  > dificuldade:
+        if  len( list( set(pixelsUrsoY).intersection(set(pixelsGarraY))) ) > dificuldade:
+            if len( list( set(pixelsUrsoX).intersection(set(pixelsUrsoX))   ) )  > dificuldade:
                 escreverDados(nome, pontos)
                 dead()
                 
@@ -154,10 +144,10 @@ def jogar():
 
 
 def start():
-    larguraButtonStart = 150
-    alturaButtonStart  = 40
-    larguraButtonQuit = 150
-    alturaButtonQuit  = 40
+    larguraButtonStart = 350
+    alturaButtonStart  = 100
+    larguraButtonQuit = 350
+    alturaButtonQuit  = 100
     
 
     while True:
@@ -166,24 +156,24 @@ def start():
                 quit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 if startButton.collidepoint(evento.pos):
-                    larguraButtonStart = 140
-                    alturaButtonStart  = 35
+                    larguraButtonStart = 350
+                    alturaButtonStart  = 100
                 if quitButton.collidepoint(evento.pos):
-                    larguraButtonQuit = 140
-                    alturaButtonQuit  = 35
+                    larguraButtonQuit = 350
+                    alturaButtonQuit  = 100
 
                 
             elif evento.type == pygame.MOUSEBUTTONUP:
                 # Verifica se o clique foi dentro do retângulo
                 if startButton.collidepoint(evento.pos):
                     #pygame.mixer.music.play(-1)
-                    larguraButtonStart = 150
-                    alturaButtonStart  = 40
+                    larguraButtonStart = 350
+                    alturaButtonStart  = 100
                     jogar()
                 if quitButton.collidepoint(evento.pos):
                     #pygame.mixer.music.play(-1)
-                    larguraButtonQuit = 150
-                    alturaButtonQuit  = 40
+                    larguraButtonQuit = 350
+                    alturaButtonQuit  = 100
                     quit()
                     
             
@@ -191,13 +181,13 @@ def start():
         tela.fill(branco)
         tela.blit(fundoStart, (0,0) )
 
-        startButton = pygame.draw.rect(tela, branco, (10,10, larguraButtonStart, alturaButtonStart), border_radius=15)
-        startTexto = fonteMenu.render("Iniciar Game", True, preto)
-        tela.blit(startTexto, (25,12))
+        startButton = pygame.draw.rect(tela, branco, (350,250, larguraButtonStart, alturaButtonStart), border_radius=15)
+        startTexto = fonteMenu.render("Iniciar Jogo", True, preto)
+        tela.blit(startTexto, (450,262))
         
-        quitButton = pygame.draw.rect(tela, branco, (10,60, larguraButtonQuit, alturaButtonQuit), border_radius=15)
-        quitTexto = fonteMenu.render("Sair do Game", True, preto)
-        tela.blit(quitTexto, (25,62))
+        quitButton = pygame.draw.rect(tela, branco, (350,400, larguraButtonQuit, alturaButtonQuit), border_radius=15)
+        quitTexto = fonteMenu.render("Sair do Jogo", True, preto)
+        tela.blit(quitTexto, (450,512))
         
         pygame.display.update()
         relogio.tick(60)
@@ -205,11 +195,11 @@ def start():
 
 def dead():
     pygame.mixer.music.stop()
-    pygame.mixer.Sound.play(explosaoSound)
-    larguraButtonStart = 150
-    alturaButtonStart  = 40
-    larguraButtonQuit = 150
-    alturaButtonQuit  = 40
+  #  pygame.mixer.Sound.play(explosaoSound)
+    larguraButtonStart = 350
+    alturaButtonStart  = 100
+    larguraButtonQuit = 350
+    alturaButtonQuit  = 100
     
     
     root = tk.Tk()
@@ -236,31 +226,31 @@ def dead():
                 quit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 if startButton.collidepoint(evento.pos):
-                    larguraButtonStart = 140
-                    alturaButtonStart  = 35
+                    larguraButtonStart = 350
+                    alturaButtonStart  = 100
                 if quitButton.collidepoint(evento.pos):
-                    larguraButtonQuit = 140
-                    alturaButtonQuit  = 35
+                    larguraButtonQuit = 450
+                    alturaButtonQuit  = 100
 
                 
             elif evento.type == pygame.MOUSEBUTTONUP:
                 # Verifica se o clique foi dentro do retângulo
                 if startButton.collidepoint(evento.pos):
                     #pygame.mixer.music.play(-1)
-                    larguraButtonStart = 150
-                    alturaButtonStart  = 40
+                    larguraButtonStart = 350
+                    alturaButtonStart  = 100
                     jogar()
                 if quitButton.collidepoint(evento.pos):
                     #pygame.mixer.music.play(-1)
-                    larguraButtonQuit = 150
-                    alturaButtonQuit  = 40
+                    larguraButtonQuit = 350
+                    alturaButtonQuit  = 100
                     quit()
                     
         
             
             
         tela.fill(branco)
-        tela.blit(fundoDead, (0,0) )
+       # tela.blit(fundoDead, (0,0) )
 
         
         startButton = pygame.draw.rect(tela, branco, (10,10, larguraButtonStart, alturaButtonStart), border_radius=15)
