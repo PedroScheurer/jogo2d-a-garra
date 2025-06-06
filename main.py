@@ -101,15 +101,15 @@ def jogar():
         posicaoXGarra = posicaoXGarra + movimentoXGarra            
         posicaoYGarra = posicaoYGarra + movimentoYGarra       
         
-        if posicaoXGarra < 0 :
-            posicaoXGarra = 15
-        elif posicaoXGarra >550:
-            posicaoXGarra = 540
+        if posicaoXGarra < 130 :
+            posicaoXGarra = 135
+        elif posicaoXGarra >770:
+            posicaoXGarra = 765
             
-        if posicaoYGarra < 0 :
-            posicaoYGarra = 15
-        elif posicaoYGarra > 473:
-            posicaoYGarra = 463
+        if posicaoYGarra < 170 :
+            posicaoYGarra = 175
+        elif posicaoYGarra > 370:
+            posicaoYGarra = 360
         
             
         tela.fill(branco)
