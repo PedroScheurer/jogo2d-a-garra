@@ -13,15 +13,15 @@ tamanho = (1000,700)
 relogio = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho) 
 pygame.display.set_caption("A Garra")
-icone  = pygame.image.load("assets/garra.png")
+icone  = pygame.image.load("recursos/garra.png")
 pygame.display.set_icon(icone)
 branco = (255,255,255)
 preto = (0, 0 ,0 )
-garra = pygame.image.load("assets/garra.png")
-fundoStart = pygame.image.load("assets/fundoJogo.png")
-fundoJogo = pygame.image.load("assets/fundoJogo.png")
+garra = pygame.image.load("recursos/garra.png")
+fundoStart = pygame.image.load("recursos/fundoJogo.png")
+fundoJogo = pygame.image.load("recursos/fundoJogo.png")
 #fundoDead = pygame.image.load("assets/fundoDead.png")
-urso = pygame.image.load("assets/ursinho.png")
+urso = pygame.image.load("recursos/ursinho.png")
 #missileSound = pygame.mixer.Sound("assets/missile.wav")
 #explosaoSound = pygame.mixer.Sound("assets/explosao.wav")
 fonteMenu = pygame.font.SysFont("comicsans",18)
@@ -68,7 +68,7 @@ def jogar():
     movimentoXGarra  = 0
     movimentoYGarra  = 0
     posicaoXUrso = 445
-    posicaoYUrso = 500
+    posicaoYUrso = 400
     #pygame.mixer.Sound.play(missileSound)
     #pygame.mixer.music.play(-1)
     pontos = 0
@@ -82,24 +82,41 @@ def jogar():
             if evento.type == pygame.QUIT:
                 quit()
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_RIGHT:
-                movimentoXGarra = 15
+                movimentoXGarra = 2
+                movimentoYGarra = 0
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_LEFT:
-                movimentoXGarra = -15
+                movimentoXGarra = -2
+                movimentoYGarra = 0
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_RIGHT:
                 movimentoXGarra = 0
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_LEFT:
                 movimentoXGarra = 0
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_UP:
-                movimentoYGarra = -15
+                movimentoYGarra = -10
+                movimentoXGarra = 0
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_DOWN:
-                movimentoYGarra = 15
+                movimentoYGarra = 10
+                movimentoXGarra = 0
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_UP:
                 movimentoYGarra = 0
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_DOWN:
                 movimentoYGarra = 0
+            elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
+                pause = True
+                while pause:
+                    tela.blit(fundoJogo, (0,0) )
+                    pygame.display.update()
+        
+                    for evento_pausa in pygame.event.get():
+                        if evento_pausa.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()
+                        elif evento_pausa.type == pygame.KEYDOWN and evento_pausa.key == pygame.K_SPACE:
+                            pause = False
+
                 
-        posicaoXGarra = posicaoXGarra + movimentoXGarra            
-        posicaoYGarra = posicaoYGarra + movimentoYGarra       
+        posicaoXGarra += movimentoXGarra            
+        posicaoYGarra += movimentoYGarra       
         
         if posicaoXGarra < 130 :
             posicaoXGarra = 135
@@ -120,6 +137,8 @@ def jogar():
         
         texto = fonteMenu.render("Pontos: "+str(pontos), True, branco)
         tela.blit(texto, (15,15))
+        texto = fonteMenu.render("Press Space to Pause Game", True, branco)
+        tela.blit(texto, (15,45))
         
         pixelsGarraX = list(range(posicaoXGarra, posicaoXGarra+larguraGarra))
         pixelsGarraY = list(range(posicaoYGarra, posicaoYGarra+alturaGarra))
@@ -129,9 +148,11 @@ def jogar():
         os.system("cls")
         
         # print( len( list( set(pixelsMisselX).intersection(set(pixelsPersonaX))   ) )   )
-        if  len( list( set(pixelsUrsoY).intersection(set(pixelsGarraY))) ) > dificuldade:
-            if len( list( set(pixelsUrsoX).intersection(set(pixelsUrsoX))   ) )  > dificuldade:
+        if  len(list(set(pixelsUrsoY).intersection(set(pixelsGarraY)))) > dificuldade:
+            if len(list(set(pixelsUrsoX).intersection(set(pixelsUrsoX))))  > dificuldade:
                 escreverDados(nome, pontos)
+                #posicaoXUrso = posicaoXGarra
+                #posicaoYUrso = posicaoYGarra + alturaGarra
                 dead()
                 
             else:

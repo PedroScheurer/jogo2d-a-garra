@@ -29,7 +29,7 @@ def escreverDados(nome, pontos):
 
     agora = datetime.now()    
     data_br = agora.strftime("%d/%m/%Y")
-    hora_br = agora.time()
+    hora_br = agora.time().strftime("%H:%M:%S")
     dadosDict[nome] = (pontos, data_br, hora_br)
     
     banco = open("base.atitus","w")
