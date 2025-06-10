@@ -18,15 +18,17 @@ pygame.display.set_icon(icone)
 branco = (255,255,255)
 preto = (0, 0 ,0 )
 garra = pygame.image.load("recursos/garra.png")
-fundoStart = pygame.image.load("recursos/fundoJogo.png")
+fundoStart = pygame.image.load("recursos/telaStartQuit.png")
 fundoJogo = pygame.image.load("recursos/fundoJogo.png")
+fundoPause = pygame.image.load("recursos/telaPause.png")
 #fundoDead = pygame.image.load("assets/fundoDead.png")
 urso = pygame.image.load("recursos/ursinho.png")
 #missileSound = pygame.mixer.Sound("assets/missile.wav")
 #explosaoSound = pygame.mixer.Sound("assets/explosao.wav")
+clique = pygame.mixer.Sound("recursos/click.wav")
 fonteMenu = pygame.font.SysFont("comicsans",18)
 fonteMorte = pygame.font.SysFont("arial",120)
-#pygame.mixer.music.load("assets/ironsound.mp3")
+pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
 
 def jogar():
     largura_janela = 300
@@ -74,9 +76,11 @@ def jogar():
     pontos = 0
     larguraGarra = 100
     alturaGarra = 80
-    larguaUrso  = 75
+    larguraUrso  = 75
     alturaUrso  = 75
     dificuldade  = 30
+    ursoPego = False
+
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -104,7 +108,7 @@ def jogar():
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
                 pause = True
                 while pause:
-                    tela.blit(fundoJogo, (0,0) )
+                    tela.blit(fundoPause, (0,0) )
                     pygame.display.update()
         
                     for evento_pausa in pygame.event.get():
@@ -127,48 +131,51 @@ def jogar():
             posicaoYGarra = 175
         elif posicaoYGarra > 370:
             posicaoYGarra = 360
+
+        if posicaoYGarra > 175:
+            movimentoXGarra = 0
         
             
         tela.fill(branco)
         tela.blit(fundoJogo, (0,0) )
-        tela.blit( garra, (posicaoXGarra, posicaoYGarra) )
+        tela.blit(garra, (posicaoXGarra, posicaoYGarra))
             
-        tela.blit( urso, (posicaoXUrso, posicaoYUrso) )
+        tela.blit(urso, (posicaoXUrso, posicaoYUrso))
         
-        texto = fonteMenu.render("Pontos: "+str(pontos), True, branco)
+        texto = fonteMenu.render("Points: "+str(pontos), True, branco)
         tela.blit(texto, (15,15))
         texto = fonteMenu.render("Press Space to Pause Game", True, branco)
         tela.blit(texto, (15,45))
         
         pixelsGarraX = list(range(posicaoXGarra, posicaoXGarra+larguraGarra))
         pixelsGarraY = list(range(posicaoYGarra, posicaoYGarra+alturaGarra))
-        pixelsUrsoX = list(range(posicaoXUrso, posicaoXUrso + larguaUrso))
+        pixelsUrsoX = list(range(posicaoXUrso, posicaoXUrso + larguraUrso))
         pixelsUrsoY = list(range(posicaoYUrso, posicaoYUrso + alturaUrso))
         
         os.system("cls")
         
-        # print( len( list( set(pixelsMisselX).intersection(set(pixelsPersonaX))   ) )   )
         if  len(list(set(pixelsUrsoY).intersection(set(pixelsGarraY)))) > dificuldade:
-            if len(list(set(pixelsUrsoX).intersection(set(pixelsUrsoX))))  > dificuldade:
+            if len(list(set(pixelsUrsoX).intersection(set(pixelsGarraX))))  > dificuldade:
                 escreverDados(nome, pontos)
-                #posicaoXUrso = posicaoXGarra
-                #posicaoYUrso = posicaoYGarra + alturaGarra
-                dead()
+                pygame.mixer.Sound.play(clique)
+                pygame.mixer.music.play(-1)
+                ursoPego = True
+                #dead()
                 
-            else:
-                print("Ainda Vivo, mas por pouco!")
-        else:
-            print("Ainda Vivo")
+        if ursoPego:
+            posicaoXUrso = posicaoXGarra + 5
+            posicaoYUrso = posicaoYGarra + alturaGarra - 20
         
         pygame.display.update()
         relogio.tick(60)
 
 
 def start():
-    larguraButtonStart = 350
-    alturaButtonStart  = 100
-    larguraButtonQuit = 350
-    alturaButtonQuit  = 100
+    larguraButtonStart = 375
+    alturaButtonStart  = 110
+
+    larguraButtonQuit = 225
+    alturaButtonQuit  = 95
     
 
     while True:
@@ -176,39 +183,38 @@ def start():
             if evento.type == pygame.QUIT:
                 quit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
-                if startButton.collidepoint(evento.pos):
-                    larguraButtonStart = 350
-                    alturaButtonStart  = 100
-                if quitButton.collidepoint(evento.pos):
-                    larguraButtonQuit = 350
-                    alturaButtonQuit  = 100
-
+                if startRect.collidepoint(evento.pos):
+                    larguraButtonStart = 375
+                    alturaButtonStart  = 110
+                if quitRect.collidepoint(evento.pos):
+                    larguraButtonQuit = 225
+                    alturaButtonQuit  = 95
                 
             elif evento.type == pygame.MOUSEBUTTONUP:
                 # Verifica se o clique foi dentro do retângulo
-                if startButton.collidepoint(evento.pos):
-                    #pygame.mixer.music.play(-1)
-                    larguraButtonStart = 350
-                    alturaButtonStart  = 100
+                if startRect.collidepoint(evento.pos):
+                    pygame.mixer.music.play(-1)
+                    larguraButtonStart = 375
+                    alturaButtonStart  = 110
                     jogar()
-                if quitButton.collidepoint(evento.pos):
-                    #pygame.mixer.music.play(-1)
-                    larguraButtonQuit = 350
-                    alturaButtonQuit  = 100
+                if quitRect.collidepoint(evento.pos):
+                    pygame.mixer.music.play(-1)
+                    larguraButtonQuit = 225
+                    alturaButtonQuit  = 95
                     quit()
                     
             
             
         tela.fill(branco)
-        tela.blit(fundoStart, (0,0) )
+        tela.blit(fundoStart,(0,0))
 
-        startButton = pygame.draw.rect(tela, branco, (350,250, larguraButtonStart, alturaButtonStart), border_radius=15)
-        startTexto = fonteMenu.render("Iniciar Jogo", True, preto)
-        tela.blit(startTexto, (450,262))
+        startButton = pygame.image.load("recursos/botaoStart.png")
+        startRect = startButton.get_rect(topleft=(270, 250))
+        tela.blit(startButton, (270,250))
         
-        quitButton = pygame.draw.rect(tela, branco, (350,400, larguraButtonQuit, alturaButtonQuit), border_radius=15)
-        quitTexto = fonteMenu.render("Sair do Jogo", True, preto)
-        tela.blit(quitTexto, (450,512))
+        quitButton = pygame.image.load("recursos/botaoQuit.png")
+        quitRect = quitButton.get_rect(topleft=(350, 380))
+        tela.blit(quitButton, (350,380))
         
         pygame.display.update()
         relogio.tick(60)
@@ -257,12 +263,12 @@ def dead():
             elif evento.type == pygame.MOUSEBUTTONUP:
                 # Verifica se o clique foi dentro do retângulo
                 if startButton.collidepoint(evento.pos):
-                    #pygame.mixer.music.play(-1)
+                    pygame.mixer.music.play(-1)
                     larguraButtonStart = 350
                     alturaButtonStart  = 100
                     jogar()
                 if quitButton.collidepoint(evento.pos):
-                    #pygame.mixer.music.play(-1)
+                    pygame.mixer.music.play(-1)
                     larguraButtonQuit = 350
                     alturaButtonQuit  = 100
                     quit()
