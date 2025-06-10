@@ -81,6 +81,21 @@ def jogar():
     dificuldade  = 30
     ursoPego = False
 
+    ursosVogais = {
+        "ursoA" : [pygame.image.load("recursos/ursinho.png"), random.randint(110,250),300],
+        "ursoE" : ["CAMINHO URSO E", random.randint(260,300),300],
+        "ursoI" : ["CAMINHO URSO I", random.randint(310,350),300],
+        "ursoO" : ["CAMINHO URSO O", random.randint(360,400),300],
+        "ursoU" : ["CAMINHO URSO U", random.randint(410,450),400],
+    }
+    ursosConsoantes = {
+        "ursoT" : [pygame.image.load("recursos/ursinho.png"), random.randint(110,250),300],
+        "ursoP" : ["CAMINHO URSO E", random.randint(260,300),300],
+        "ursoC" : ["CAMINHO URSO I", random.randint(310,350),300],
+        "ursoB" : ["CAMINHO URSO O", random.randint(360,400),300],
+        "ursoM" : ["CAMINHO URSO U", random.randint(410,450),400],
+    }
+
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -139,8 +154,9 @@ def jogar():
         tela.fill(branco)
         tela.blit(fundoJogo, (0,0) )
         tela.blit(garra, (posicaoXGarra, posicaoYGarra))
-            
-        tela.blit(urso, (posicaoXUrso, posicaoYUrso))
+
+        for chave in ursosVogais.keys():    
+            tela.blit(ursosVogais[chave][0], (ursosVogais[chave][1], ursosVogais[chave][2]))
         
         texto = fonteMenu.render("Points: "+str(pontos), True, branco)
         tela.blit(texto, (15,15))
@@ -154,8 +170,8 @@ def jogar():
         
         os.system("cls")
         
-        if  len(list(set(pixelsUrsoY).intersection(set(pixelsGarraY)))) > dificuldade:
-            if len(list(set(pixelsUrsoX).intersection(set(pixelsGarraX))))  > dificuldade:
+        if len(list(set(pixelsUrsoY).intersection(set(pixelsGarraY)))) > dificuldade:
+            if len(list(set(pixelsUrsoX).intersection(set(pixelsGarraX)))) > dificuldade:
                 escreverDados(nome, pontos)
                 pygame.mixer.Sound.play(clique)
                 pygame.mixer.music.play(-1)
