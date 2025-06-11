@@ -72,17 +72,14 @@ def jogar():
     posicaoYGarra = -200
     movimentoXGarra  = 0
     movimentoYGarra  = 0
-    posicaoXUrso = 445
-    posicaoYUrso = 400
-    #pygame.mixer.Sound.play(missileSound)
-    #pygame.mixer.music.play(-1)
     pontos = 0
     larguraGarra = 115
     alturaGarra = 400
-    larguraUrso  = 75
-    alturaUrso  = 75
+    larguraUrso  = 90
+    alturaUrso  = 120
     dificuldade  = 30
     ursoPego = False
+    ursoSelecionado = None
 
     ursosVogais = {
         "ursoA" : [pygame.image.load("recursos/ursoAsemfundoPequeno.png"), random.randint(160,170),280],
@@ -99,6 +96,8 @@ def jogar():
         "ursoG" : [pygame.image.load("recursos/ursoGsemfundoPequeno.png"), random.randint(535,545),315],
     }
 
+    ursos = {**ursosVogais, **ursosConsoantes}
+
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -114,10 +113,10 @@ def jogar():
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_LEFT:
                 movimentoXGarra = 0
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_UP:
-                movimentoYGarra = -7
+                movimentoYGarra = -5
                 movimentoXGarra = 0
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_DOWN:
-                movimentoYGarra = 10
+                movimentoYGarra = 5
                 movimentoXGarra = 0
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_UP:
                 movimentoYGarra = 0
@@ -157,10 +156,9 @@ def jogar():
         tela.fill(branco)
         tela.blit(fundoJogo, (0,0) )
 
-        for chave in ursosVogais.keys():    
-            tela.blit(ursosVogais[chave][0], (ursosVogais[chave][1], ursosVogais[chave][2]))
-        for chave in ursosConsoantes.keys():    
-            tela.blit(ursosConsoantes[chave][0], (ursosConsoantes[chave][1], ursosConsoantes[chave][2]))
+        for chave in ursos.keys():    
+            tela.blit(ursos[chave][0], (ursos[chave][1], ursos[chave][2]))
+        
         tela.blit(garra, (posicaoXGarra, posicaoYGarra))
         tela.blit(maquinaCima,(1,0))
         tela.blit(joyStick,(190,415))
@@ -171,25 +169,34 @@ def jogar():
         texto = fonteMenu.render("Press Space to Pause Game", True, branco)
         tela.blit(texto, (15,45))
         
-        pixelsGarraX = list(range(posicaoXGarra, posicaoXGarra+larguraGarra))
-        pixelsGarraY = list(range(posicaoYGarra, posicaoYGarra+alturaGarra))
-        pixelsUrsoX = list(range(posicaoXUrso, posicaoXUrso + larguraUrso))
-        pixelsUrsoY = list(range(posicaoYUrso, posicaoYUrso + alturaUrso))
+        garraRect = pygame.Rect(posicaoXGarra, posicaoYGarra, larguraGarra, alturaGarra)
+        pygame.draw.rect(tela, (255, 0, 0), garraRect, 2)
         
-        os.system("cls")
+        for nomeUrso, dadosUrso in ursos.items():
+            ursoRect = pygame.Rect(dadosUrso[1], dadosUrso[2], larguraUrso, alturaUrso)
+            pygame.draw.rect(tela, (0, 255, 0), ursoRect, 2) 
+            print(f"Garra: X={posicaoXGarra}, Y={posicaoYGarra}, Largura={larguraGarra}, Altura={alturaGarra}")
+            print(f"Urso {nomeUrso}: X={dadosUrso[1]}, Y={dadosUrso[2]}, Largura={larguraUrso}, Altura={alturaUrso}")
         
-        if len(list(set(pixelsUrsoY).intersection(set(pixelsGarraY)))) > dificuldade:
-            if len(list(set(pixelsUrsoX).intersection(set(pixelsGarraX)))) > dificuldade:
+        
+            if garraRect.colliderect(ursoRect):
                 escreverDados(nome, pontos)
                 pygame.mixer.Sound.play(somPegar)
-                pygame.mixer.music.play(-1)
+                if not pygame.mixer.music.get_busy():
+                    pygame.mixer.music.play(-1)
                 ursoPego = True
-                #dead()
-                
-        if ursoPego:
-            posicaoXUrso = posicaoXGarra + 5
-            posicaoYUrso = posicaoYGarra + alturaGarra - 20
+                ursoSelecionado = nomeUrso
+                break   
+                    
+        if ursoSelecionado:
+            ursos[ursoSelecionado][1] = posicaoXGarra
+            ursos[ursoSelecionado][2] = posicaoYGarra + alturaGarra
         
+            
+            print(f"Verificando colisão com {nomeUrso} na posição ({dadosUrso[1]}, {dadosUrso[2]})")
+            os.system("cls")
+
+
         pygame.display.update()
         relogio.tick(60)
 
