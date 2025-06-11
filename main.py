@@ -13,19 +13,22 @@ tamanho = (1000,700)
 relogio = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho) 
 pygame.display.set_caption("A Garra")
-icone  = pygame.image.load("recursos/garra.png")
+icone  = pygame.image.load("recursos/garraLongasemfundo.png")
 pygame.display.set_icon(icone)
 branco = (255,255,255)
 preto = (0, 0 ,0 )
-garra = pygame.image.load("recursos/garra.png")
-fundoStart = pygame.image.load("recursos/telaStartQuit.png")
-fundoJogo = pygame.image.load("recursos/fundoJogo.png")
-fundoPause = pygame.image.load("recursos/telaPause.png")
+garra = pygame.image.load("recursos/garraLongasemfundo.png")
+fundoStart = pygame.image.load("recursos/startAndQuit.png")
+fundoJogo = pygame.image.load("recursos/telaJogo.png")
+maquinaCima = pygame.image.load("recursos/telaJogoMaquinaCima.png")
+joyStick = pygame.image.load("recursos/telaJoySticksemfundo.png")
+fundoPause = pygame.image.load("recursos/paused.png")
 #fundoDead = pygame.image.load("assets/fundoDead.png")
-urso = pygame.image.load("recursos/ursinho.png")
+#urso = pygame.image.load("recursos/ursinho.png")
 #missileSound = pygame.mixer.Sound("assets/missile.wav")
 #explosaoSound = pygame.mixer.Sound("assets/explosao.wav")
-clique = pygame.mixer.Sound("recursos/click.wav")
+somClique = pygame.mixer.Sound("recursos/click.wav")
+somPegar = pygame.mixer.Sound("recursos/pickup_2.wav")
 fonteMenu = pygame.font.SysFont("comicsans",18)
 fonteMorte = pygame.font.SysFont("arial",120)
 pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
@@ -65,8 +68,8 @@ def jogar():
     root.mainloop()
     
 
-    posicaoXGarra = 400
-    posicaoYGarra = 175
+    posicaoXGarra = 500
+    posicaoYGarra = -200
     movimentoXGarra  = 0
     movimentoYGarra  = 0
     posicaoXUrso = 445
@@ -74,26 +77,26 @@ def jogar():
     #pygame.mixer.Sound.play(missileSound)
     #pygame.mixer.music.play(-1)
     pontos = 0
-    larguraGarra = 100
-    alturaGarra = 80
+    larguraGarra = 115
+    alturaGarra = 400
     larguraUrso  = 75
     alturaUrso  = 75
     dificuldade  = 30
     ursoPego = False
 
     ursosVogais = {
-        "ursoA" : [pygame.image.load("recursos/ursinho.png"), random.randint(110,250),300],
-        "ursoE" : ["CAMINHO URSO E", random.randint(260,300),300],
-        "ursoI" : ["CAMINHO URSO I", random.randint(310,350),300],
-        "ursoO" : ["CAMINHO URSO O", random.randint(360,400),300],
-        "ursoU" : ["CAMINHO URSO U", random.randint(410,450),400],
+        "ursoA" : [pygame.image.load("recursos/ursoAsemfundoPequeno.png"), random.randint(160,170),280],
+        "ursoE" : [pygame.image.load("recursos/ursoEsemfundoPequeno.png"), random.randint(270,280),280],
+        "ursoI" : [pygame.image.load("recursos/ursoIsemfundoPequeno.png"), random.randint(380,390),280],
+        "ursoO" : [pygame.image.load("recursos/ursoOsemfundoPequeno.png"), random.randint(470,480),280],
+        "ursoU" : [pygame.image.load("recursos/ursoUsemfundoPequeno.png"), random.randint(585,595),280],
     }
     ursosConsoantes = {
-        "ursoT" : [pygame.image.load("recursos/ursinho.png"), random.randint(110,250),300],
-        "ursoP" : ["CAMINHO URSO E", random.randint(260,300),300],
-        "ursoC" : ["CAMINHO URSO I", random.randint(310,350),300],
-        "ursoB" : ["CAMINHO URSO O", random.randint(360,400),300],
-        "ursoM" : ["CAMINHO URSO U", random.randint(410,450),400],
+        "ursoH" : [pygame.image.load("recursos/ursoHsemfundoPequeno.png"), random.randint(100,120),315],
+        "ursoJ" : [pygame.image.load("recursos/ursoJsemfundoPequeno.png"), random.randint(230,240),300],
+        "ursoK" : [pygame.image.load("recursos/ursoKsemfundoPequeno.png"), random.randint(330,340),315],
+        "ursoB" : [pygame.image.load("recursos/ursoBsemfundoPequeno.png"), random.randint(430,440),315],
+        "ursoG" : [pygame.image.load("recursos/ursoGsemfundoPequeno.png"), random.randint(535,545),315],
     }
 
     while True:
@@ -111,7 +114,7 @@ def jogar():
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_LEFT:
                 movimentoXGarra = 0
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_UP:
-                movimentoYGarra = -10
+                movimentoYGarra = -7
                 movimentoXGarra = 0
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_DOWN:
                 movimentoYGarra = 10
@@ -137,26 +140,31 @@ def jogar():
         posicaoXGarra += movimentoXGarra            
         posicaoYGarra += movimentoYGarra       
         
-        if posicaoXGarra < 130 :
-            posicaoXGarra = 135
-        elif posicaoXGarra >770:
-            posicaoXGarra = 765
+        if posicaoXGarra < 95 :
+            posicaoXGarra = 100
+        elif posicaoXGarra > 820:
+            posicaoXGarra = 815
             
-        if posicaoYGarra < 170 :
-            posicaoYGarra = 175
-        elif posicaoYGarra > 370:
-            posicaoYGarra = 360
+        if posicaoYGarra < -200 :
+            posicaoYGarra = -195
+        elif posicaoYGarra > 50:
+            posicaoYGarra = 55
 
-        if posicaoYGarra > 175:
+        if posicaoYGarra > -175:
             movimentoXGarra = 0
         
             
         tela.fill(branco)
         tela.blit(fundoJogo, (0,0) )
-        tela.blit(garra, (posicaoXGarra, posicaoYGarra))
 
         for chave in ursosVogais.keys():    
             tela.blit(ursosVogais[chave][0], (ursosVogais[chave][1], ursosVogais[chave][2]))
+        for chave in ursosConsoantes.keys():    
+            tela.blit(ursosConsoantes[chave][0], (ursosConsoantes[chave][1], ursosConsoantes[chave][2]))
+        tela.blit(garra, (posicaoXGarra, posicaoYGarra))
+        tela.blit(maquinaCima,(1,0))
+        tela.blit(joyStick,(190,415))
+
         
         texto = fonteMenu.render("Points: "+str(pontos), True, branco)
         tela.blit(texto, (15,15))
@@ -173,7 +181,7 @@ def jogar():
         if len(list(set(pixelsUrsoY).intersection(set(pixelsGarraY)))) > dificuldade:
             if len(list(set(pixelsUrsoX).intersection(set(pixelsGarraX)))) > dificuldade:
                 escreverDados(nome, pontos)
-                pygame.mixer.Sound.play(clique)
+                pygame.mixer.Sound.play(somPegar)
                 pygame.mixer.music.play(-1)
                 ursoPego = True
                 #dead()
@@ -187,11 +195,11 @@ def jogar():
 
 
 def start():
-    larguraButtonStart = 375
-    alturaButtonStart  = 110
+    larguraButtonStart = 355
+    alturaButtonStart  = 105
 
-    larguraButtonQuit = 225
-    alturaButtonQuit  = 95
+    larguraButtonQuit = 330
+    alturaButtonQuit  = 100
     
 
     while True:
@@ -200,23 +208,25 @@ def start():
                 quit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 if startRect.collidepoint(evento.pos):
-                    larguraButtonStart = 375
-                    alturaButtonStart  = 110
+                    larguraButtonStart = 355
+                    alturaButtonStart  = 105
                 if quitRect.collidepoint(evento.pos):
-                    larguraButtonQuit = 225
-                    alturaButtonQuit  = 95
+                    larguraButtonQuit = 330
+                    alturaButtonQuit  = 110
                 
             elif evento.type == pygame.MOUSEBUTTONUP:
                 # Verifica se o clique foi dentro do retângulo
                 if startRect.collidepoint(evento.pos):
                     pygame.mixer.music.play(-1)
-                    larguraButtonStart = 375
-                    alturaButtonStart  = 110
+                    larguraButtonStart = 355
+                    alturaButtonStart  = 105
+                    pygame.mixer.Sound.play(somClique)
                     jogar()
                 if quitRect.collidepoint(evento.pos):
                     pygame.mixer.music.play(-1)
-                    larguraButtonQuit = 225
-                    alturaButtonQuit  = 95
+                    larguraButtonQuit = 330
+                    alturaButtonQuit  = 110
+                    pygame.mixer.Sound.play(somClique)
                     quit()
                     
             
@@ -224,13 +234,13 @@ def start():
         tela.fill(branco)
         tela.blit(fundoStart,(0,0))
 
-        startButton = pygame.image.load("recursos/botaoStart.png")
-        startRect = startButton.get_rect(topleft=(270, 250))
-        tela.blit(startButton, (270,250))
+        startButton = pygame.image.load("recursos/botaoStartv2.png")
+        startRect = startButton.get_rect(topleft=(405, 210))
+        tela.blit(startButton, (405,210))
         
-        quitButton = pygame.image.load("recursos/botaoQuit.png")
-        quitRect = quitButton.get_rect(topleft=(350, 380))
-        tela.blit(quitButton, (350,380))
+        quitButton = pygame.image.load("recursos/botaoQuitv2.png")
+        quitRect = quitButton.get_rect(topleft=(425, 330))
+        tela.blit(quitButton, (425,330))
         
         pygame.display.update()
         relogio.tick(60)
