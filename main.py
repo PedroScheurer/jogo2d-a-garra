@@ -23,6 +23,7 @@ fundoJogo = pygame.image.load("recursos/telaJogo.png")
 maquinaCima = pygame.image.load("recursos/telaJogoMaquinaCima.png")
 joyStick = pygame.image.load("recursos/telaJoySticksemfundo.png")
 fundoPause = pygame.image.load("recursos/paused.png")
+buracoUrso = pygame.image.load("recursos/buracoUrso.png")
 #fundoDead = pygame.image.load("assets/fundoDead.png")
 #urso = pygame.image.load("recursos/ursinho.png")
 #missileSound = pygame.mixer.Sound("assets/missile.wav")
@@ -77,8 +78,12 @@ def jogar():
     alturaGarra = 400
     larguraUrso  = 90
     alturaUrso  = 120
-    dificuldade  = 30
-    ursoPego = False
+    larguraBuraco = 276
+    alturaBuraco = 65
+    posicaoXBuraco = 653
+    posicaoYBuraco = 390
+
+
     ursoSelecionado = None
 
     ursosVogais = {
@@ -97,9 +102,12 @@ def jogar():
     }
 
     ursos = {**ursosVogais, **ursosConsoantes}
+    ursosPegos = []
+
 
     while True:
-        for evento in pygame.event.get():
+        eventos = pygame.event.get()
+        for evento in eventos:
             if evento.type == pygame.QUIT:
                 quit()
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_RIGHT:
@@ -128,11 +136,11 @@ def jogar():
                     tela.blit(fundoPause, (0,0) )
                     pygame.display.update()
         
-                    for evento_pausa in pygame.event.get():
-                        if evento_pausa.type == pygame.QUIT:
+                    for eventoPausa in eventos:
+                        if eventoPausa.type == pygame.QUIT:
                             pygame.quit()
                             exit()
-                        elif evento_pausa.type == pygame.KEYDOWN and evento_pausa.key == pygame.K_SPACE:
+                        elif eventoPausa.type == pygame.KEYDOWN and eventoPausa.key == pygame.K_SPACE:
                             pause = False
 
                 
@@ -154,7 +162,7 @@ def jogar():
         
             
         tela.fill(branco)
-        tela.blit(fundoJogo, (0,0) )
+        tela.blit(fundoJogo, (0,0))
 
         for chave in ursos.keys():    
             tela.blit(ursos[chave][0], (ursos[chave][1], ursos[chave][2]))
@@ -178,23 +186,34 @@ def jogar():
             print(f"Garra: X={posicaoXGarra}, Y={posicaoYGarra}, Largura={larguraGarra}, Altura={alturaGarra}")
             print(f"Urso {nomeUrso}: X={dadosUrso[1]}, Y={dadosUrso[2]}, Largura={larguraUrso}, Altura={alturaUrso}")
         
+            for eventoAgarrar in eventos:
+                if eventoAgarrar.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                
+                elif eventoAgarrar.type == pygame.KEYDOWN and eventoAgarrar.key == pygame.K_RETURN: 
+                    if garraRect.colliderect(ursoRect):
+                        escreverDados(nome, pontos)
+                        pygame.mixer.Sound.play(somPegar)
+                        if not pygame.mixer.music.get_busy():
+                            pygame.mixer.music.play(-1)
+                        ursoPego = True
+                        ursoSelecionado = nomeUrso
+                        xUrsoSelecionado = dadosUrso[1]
+                        yUrsoSelecionado = dadosUrso[2]
+                        break   
         
-            if garraRect.colliderect(ursoRect):
-                escreverDados(nome, pontos)
-                pygame.mixer.Sound.play(somPegar)
-                if not pygame.mixer.music.get_busy():
-                    pygame.mixer.music.play(-1)
-                ursoPego = True
-                ursoSelecionado = nomeUrso
-                break   
-                    
+        tela.blit(buracoUrso, (posicaoXBuraco, posicaoYBuraco))
+
         if ursoSelecionado:
             ursos[ursoSelecionado][1] = posicaoXGarra
             ursos[ursoSelecionado][2] = posicaoYGarra + alturaGarra
         
+        if xUrsoSelecionado + 40 == posicaoXBuraco:
+            print("urso caputarado")
             
-            print(f"Verificando colisão com {nomeUrso} na posição ({dadosUrso[1]}, {dadosUrso[2]})")
-            os.system("cls")
+        print(f"Verificando colisão com {nomeUrso} na posição ({dadosUrso[1]}, {dadosUrso[2]})")
+        os.system("cls")
 
 
         pygame.display.update()
