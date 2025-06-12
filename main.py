@@ -19,6 +19,7 @@ branco = (255,255,255)
 preto = (0, 0 ,0 )
 garra = pygame.image.load("recursos/garraLongasemfundo.png")
 fundoStart = pygame.image.load("recursos/startAndQuit.png")
+fundoIniciar = pygame.image.load("recursos/iniciarESair.png")
 fundoJogo = pygame.image.load("recursos/telaJogo.png")
 maquinaCima = pygame.image.load("recursos/telaJogoMaquinaCima.png")
 joyStick = pygame.image.load("recursos/telaJoySticksemfundo.png")
@@ -30,9 +31,12 @@ buracoUrso = pygame.image.load("recursos/buracoUrso.png")
 #explosaoSound = pygame.mixer.Sound("assets/explosao.wav")
 somClique = pygame.mixer.Sound("recursos/click.wav")
 somPegar = pygame.mixer.Sound("recursos/pickup_2.wav")
-fonteMenu = pygame.font.SysFont("comicsans",18)
-fonteMorte = pygame.font.SysFont("arial",120)
+fonteMenu = pygame.font.Font("recursos/PressStart2P.ttf",24)
+fonteMorte = pygame.font.Font("recursos/PressStart2P.ttf",24)
 pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
+botaoPTBR = pygame.image.load("recursos/botaoPTBR.png")
+botaoENUS = pygame.image.load("recursos/botaoENUS.png")
+
 
 def jogar():
     largura_janela = 300
@@ -68,7 +72,7 @@ def jogar():
     # Inicia o loop da interface gráfica
     root.mainloop()
     
-
+    ptbr = True
     posicaoXGarra = 500
     posicaoYGarra = -200
     movimentoXGarra  = 0
@@ -82,7 +86,6 @@ def jogar():
     alturaBuraco = 65
     posicaoXBuraco = 653
     posicaoYBuraco = 390
-
 
     ursoSelecionado = None
 
@@ -103,6 +106,7 @@ def jogar():
 
     ursos = {**ursosVogais, **ursosConsoantes}
     ursosPegos = []
+    ursosVogaisPegos = []
 
 
     while True:
@@ -164,27 +168,30 @@ def jogar():
         tela.fill(branco)
         tela.blit(fundoJogo, (0,0))
 
-        for chave in ursos.keys():    
-            tela.blit(ursos[chave][0], (ursos[chave][1], ursos[chave][2]))
+        for nomeUrso in ursos.keys():
+            if nomeUrso not in ursosPegos:
+                tela.blit(ursos[nomeUrso][0], (ursos[nomeUrso][1], ursos[nomeUrso][2]))
         
         tela.blit(garra, (posicaoXGarra, posicaoYGarra))
         tela.blit(maquinaCima,(1,0))
         tela.blit(joyStick,(190,415))
 
-        
-        texto = fonteMenu.render("Points: "+str(pontos), True, branco)
+        if ptbr:
+            texto = fonteMenu.render("Pontos: "+str(pontos), True, branco)
+        else:
+            texto = fonteMenu.render("Points: "+str(pontos), True, branco)
         tela.blit(texto, (15,15))
-        texto = fonteMenu.render("Press Space to Pause Game", True, branco)
+        if ptbr:
+            texto = fonteMenu.render("Pressione Espaço para Pausar o Jogo", True, branco)
+        else:
+            texto = fonteMenu.render("Press Space to Pause Game", True, branco)
         tela.blit(texto, (15,45))
         
         garraRect = pygame.Rect(posicaoXGarra, posicaoYGarra, larguraGarra, alturaGarra)
-        pygame.draw.rect(tela, (255, 0, 0), garraRect, 2)
+
         
         for nomeUrso, dadosUrso in ursos.items():
-            ursoRect = pygame.Rect(dadosUrso[1], dadosUrso[2], larguraUrso, alturaUrso)
-            pygame.draw.rect(tela, (0, 255, 0), ursoRect, 2) 
-            print(f"Garra: X={posicaoXGarra}, Y={posicaoYGarra}, Largura={larguraGarra}, Altura={alturaGarra}")
-            print(f"Urso {nomeUrso}: X={dadosUrso[1]}, Y={dadosUrso[2]}, Largura={larguraUrso}, Altura={alturaUrso}")
+            ursoRect = pygame.Rect(dadosUrso[1], dadosUrso[2], larguraUrso, alturaUrso)    
         
             for eventoAgarrar in eventos:
                 if eventoAgarrar.type == pygame.QUIT:
@@ -197,10 +204,7 @@ def jogar():
                         pygame.mixer.Sound.play(somPegar)
                         if not pygame.mixer.music.get_busy():
                             pygame.mixer.music.play(-1)
-                        ursoPego = True
                         ursoSelecionado = nomeUrso
-                        xUrsoSelecionado = dadosUrso[1]
-                        yUrsoSelecionado = dadosUrso[2]
                         break   
         
         tela.blit(buracoUrso, (posicaoXBuraco, posicaoYBuraco))
@@ -209,11 +213,17 @@ def jogar():
             ursos[ursoSelecionado][1] = posicaoXGarra
             ursos[ursoSelecionado][2] = posicaoYGarra + alturaGarra
         
-        if xUrsoSelecionado + 40 == posicaoXBuraco:
-            print("urso caputarado")
+            if posicaoXBuraco + 45 < ursos[ursoSelecionado][1] + 45 < posicaoXBuraco + larguraBuraco:
+                if ursos[ursoSelecionado][2] + 50 == posicaoYBuraco:
+                    ursosPegos.append(ursoSelecionado)
             
-        print(f"Verificando colisão com {nomeUrso} na posição ({dadosUrso[1]}, {dadosUrso[2]})")
-        os.system("cls")
+        for ursoPego in ursosPegos:
+            if ursoPego in ursosVogais.keys():
+                pontos += 1
+                ursosVogaisPegos.append(ursoPego)
+                ursosPegos.remove(ursosPegos)
+            else:
+                dead()
 
 
         pygame.display.update()
@@ -221,6 +231,7 @@ def jogar():
 
 
 def start():
+    ptbr = True
     larguraButtonStart = 355
     alturaButtonStart  = 105
 
@@ -233,6 +244,7 @@ def start():
             if evento.type == pygame.QUIT:
                 quit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
+
                 if startRect.collidepoint(evento.pos):
                     larguraButtonStart = 355
                     alturaButtonStart  = 105
@@ -258,15 +270,29 @@ def start():
             
             
         tela.fill(branco)
-        tela.blit(fundoStart,(0,0))
 
-        startButton = pygame.image.load("recursos/botaoStartv2.png")
-        startRect = startButton.get_rect(topleft=(405, 210))
-        tela.blit(startButton, (405,210))
+        if ptbr:
+            tela.blit(fundoIniciar,(0,0))
+            tela.blit(botaoPTBR,(800,15))
+            tela.blit(botaoENUS,(800,115))
+            startButton = pygame.image.load("recursos/botaoIniciar.png")
+            startRect = startButton.get_rect(topleft=(400, 215))
+            tela.blit(startButton, (400,215))
+
+            quitButton = pygame.image.load("recursos/botaoSair.png")
+            quitRect = quitButton.get_rect(topleft=(400, 335))
+            tela.blit(quitButton, (400,335))
+        else:    
+            tela.blit(fundoStart,(0,0))
+            tela.blit(botaoPTBR,(750,15))
+            tela.blit(botaoENUS,(750,115))
+            startButton = pygame.image.load("recursos/botaoStartv2.png")
+            startRect = startButton.get_rect(topleft=(405, 210))
+            tela.blit(startButton, (405,210))
         
-        quitButton = pygame.image.load("recursos/botaoQuitv2.png")
-        quitRect = quitButton.get_rect(topleft=(425, 330))
-        tela.blit(quitButton, (425,330))
+            quitButton = pygame.image.load("recursos/botaoQuitv2.png")
+            quitRect = quitButton.get_rect(topleft=(425, 330))
+            tela.blit(quitButton, (425,330))
         
         pygame.display.update()
         relogio.tick(60)
@@ -289,14 +315,14 @@ def dead():
     label.pack(pady=10)
 
     # Criação do Listbox para mostrar o log
-    listbox = tk.Listbox(root, width=50, height=10, selectmode=tk.SINGLE)
+    listbox = tk.Listbox(root, width=75, height=10, selectmode=tk.SINGLE)
     listbox.pack(pady=20)
 
     # Adiciona o log das partidas no Listbox
     log_partidas = open("base.atitus", "r").read()
     log_partidas = json.loads(log_partidas)
     for chave in log_partidas:
-        listbox.insert(tk.END, f"Pontos: {log_partidas[chave][0]} na data: {log_partidas[chave][1]} - Nickname: {chave}")  # Adiciona cada linha no Listbox
+        listbox.insert(tk.END, f"Pontos: {log_partidas[chave][0]} na data: {log_partidas[chave][1]} na hora: {log_partidas[chave][2]} - Nickname: {chave} ")  # Adiciona cada linha no Listbox
     
     root.mainloop()
     while True:
@@ -329,7 +355,6 @@ def dead():
             
             
         tela.fill(branco)
-       # tela.blit(fundoDead, (0,0) )
 
         
         startButton = pygame.draw.rect(tela, branco, (10,10, larguraButtonStart, alturaButtonStart), border_radius=15)
