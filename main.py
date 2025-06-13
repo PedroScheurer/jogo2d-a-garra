@@ -19,8 +19,8 @@ branco = (255,255,255)
 preto = (0, 0 ,0 )
 garra = pygame.image.load("recursos/garraLongasemfundo.png")
 fundoStart = pygame.image.load("recursos/startAndQuit.png")
-fundoIniciar = pygame.image.load("recursos/iniciarESair.png")
 fundoJogo = pygame.image.load("recursos/telaJogo.png")
+fundoPerdeu = pygame.image.load("recursos/telaPerdeu.png")
 maquinaCima = pygame.image.load("recursos/telaJogoMaquinaCima.png")
 joyStick = pygame.image.load("recursos/telaJoySticksemfundo.png")
 fundoPause = pygame.image.load("recursos/paused.png")
@@ -29,48 +29,53 @@ somCaptura = pygame.mixer.Sound("recursos/pickup_2.wav")
 somGameOver = pygame.mixer.Sound("recursos/game_over.wav")
 somClique = pygame.mixer.Sound("recursos/click.wav")
 somPegar = pygame.mixer.Sound("recursos/pickup_2.wav")
-fonteMenu = pygame.font.Font("recursos/PressStart2P.ttf",18)
+fonteMenu = pygame.font.Font("recursos/PressStart2P.ttf",14)
 fontePontos = pygame.font.Font("recursos/PressStart2P.ttf",24)
 fonteMorte = pygame.font.Font("recursos/PressStart2P.ttf",18)
+fonteNome = pygame.font.Font("recursos/PressStart2P.ttf",42)
 pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
-
+nomeDigitado = False
 
 
 def jogar():
     largura_janela = 300
     altura_janela = 50
-    def obter_nome():
-        global nome
-        nome = entry_nome.get()  # Obtém o texto digitado
-        if not nome:  # Se o campo estiver vazio
-            messagebox.showwarning("Aviso", "Por favor, digite seu nome!")  # Exibe uma mensagem de aviso
-        else:
-            #print(f'Nome digitado: {nome}')  # Exibe o nome no console
-            root.destroy()  # Fecha a janela após a entrada válida
+    if not nomeDigitado:
+        def obter_nome():
+            global nome, nomeDigitado
+            nome = entry_nome.get()  # Obtém o texto digitado
+            if not nome:  # Se o campo estiver vazio
+                messagebox.showwarning("Aviso", "Por favor, digite seu nome!")  # Exibe uma mensagem de aviso
+            else:
+                nomeDigitado = True
+                #print(f'Nome digitado: {nome}')  # Exibe o nome no console
+                root.destroy()  # Fecha a janela após a entrada válida
+                telaBoasVindas()
 
-    # Criação da janela principal
-    root = tk.Tk()
-    # Obter as dimensões da tela
-    largura_tela = root.winfo_screenwidth()
-    altura_tela = root.winfo_screenheight()
-    pos_x = (largura_tela - largura_janela) // 2
-    pos_y = (altura_tela - altura_janela) // 2
-    root.geometry(f"{largura_janela}x{altura_janela}+{pos_x}+{pos_y}")
-    root.title("Informe seu nickname")
-    root.protocol("WM_DELETE_WINDOW", obter_nome)
 
-    # Entry (campo de texto)
-    entry_nome = tk.Entry(root)
-    entry_nome.pack()
+        # Criação da janela principal
+        root = tk.Tk()
+        # Obter as dimensões da tela
+        largura_tela = root.winfo_screenwidth()
+        altura_tela = root.winfo_screenheight()
+        pos_x = (largura_tela - largura_janela) // 2
+        pos_y = (altura_tela - altura_janela) // 2
+        root.geometry(f"{largura_janela}x{altura_janela}+{pos_x}+{pos_y}")
+        root.title("Informe seu nickname")
+        root.protocol("WM_DELETE_WINDOW", obter_nome)
 
-    # Botão para pegar o nome
-    botao = tk.Button(root, text="Enviar", command=obter_nome)
-    botao.pack()
+        # Entry (campo de texto)
+        entry_nome = tk.Entry(root)
+        entry_nome.pack()
 
-    # Inicia o loop da interface gráfica
-    root.mainloop()
+        # Botão para pegar o nome
+        botao = tk.Button(root, text="Enviar", command=obter_nome)
+        botao.pack()
+
+        # Inicia o loop da interface gráfica
+        root.mainloop()
     
-    ptbr = True
+    cadastroRealizado = True
     posicaoXGarra = 500
     posicaoYGarra = -200
     movimentoXGarra  = 0
@@ -105,7 +110,7 @@ def jogar():
     ursos = {**ursosVogais, **ursosConsoantes}
     ursosPegos = []
     ursosVogaisPegos = []
-
+    ursosConsoantesPegos = []
 
     while True:
         eventos = pygame.event.get()
@@ -178,7 +183,7 @@ def jogar():
             texto = fontePontos.render("Pontos: "+str(pontos), True, branco)
         else:
             texto = fontePontos.render("Points: "+str(pontos), True, branco)
-        tela.blit(texto, (500,65))
+        tela.blit(texto, (470,65))
         if ptbr:
             texto = fonteMenu.render("Pressione Espaço para Pausar o Jogo", True, branco)
         else:
@@ -198,7 +203,6 @@ def jogar():
                 
                 elif eventoAgarrar.type == pygame.KEYDOWN and eventoAgarrar.key == pygame.K_RETURN: 
                     if garraRect.colliderect(ursoRect):
-                        escreverDados(nome, pontos)
                         pygame.mixer.Sound.play(somPegar)
                         if not pygame.mixer.music.get_busy():
                             pygame.mixer.music.play(-1)
@@ -210,10 +214,9 @@ def jogar():
             ursos[ursoSelecionado][2] = posicaoYGarra + alturaGarra - 10
         
             if posicaoXBuraco + 45 < ursos[ursoSelecionado][1] + 45 < posicaoXBuraco + larguraBuraco:
-                if ursos[ursoSelecionado][2] + 25 == posicaoYBuraco:
+                if ursos[ursoSelecionado][2] + 60 == posicaoYBuraco:
                     ursosPegos.append(ursoSelecionado)
-                    ursos[ursoSelecionado][1] = 0
-                    ursos[ursoSelecionado][2] = 0
+                    ursoSelecionado = None
                     pygame.mixer.Sound.play(somPegar)
             
         for ursoPego in ursosPegos:
@@ -221,16 +224,115 @@ def jogar():
                 if ursoPego not in ursosVogaisPegos:
                     ursosVogaisPegos.append(ursoPego)
                     pontos = len(ursosVogaisPegos)
-            elif len(ursosPegos) > 2:
-                perdeu()
+            elif ursoPego in ursosConsoantes.keys():
+                if ursoPego not in ursosConsoantesPegos:
+                    ursosConsoantesPegos.append(ursoPego)
+            
+        if len(ursosConsoantesPegos) == 2:
+            escreverDados(nome, pontos)
+            perdeu()
 
+        if len(ursosVogaisPegos) == 5:
+            print("vitoria")
+            telaVitoria()
+
+        pygame.display.update()
+        relogio.tick(60)
+
+
+def telaVitoria():
+    fundoVitoria = pygame.image.load("recursos/telaVitoria.png")
+    textoVitoria = fonteNome.render(f"{nome}", True, branco)
+
+    larguraButtonStart = 350
+    alturaButtonStart  = 100
+    larguraButtonQuit = 350
+    alturaButtonQuit  = 100
+
+    while True:
+        tela.fill(branco)
+        tela.blit(fundoVitoria, (0, 0))  # Exibe a imagem de fundo de boas-vindas
+        tela.blit(textoVitoria, (500,180))
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                quit()
+            elif evento.type == pygame.MOUSEBUTTONDOWN:
+                if startButton.collidepoint(evento.pos):
+                    larguraButtonStart = 350
+                    alturaButtonStart  = 100
+                if quitButton.collidepoint(evento.pos):
+                    larguraButtonQuit = 350
+                    alturaButtonQuit  = 100
+ 
+            elif evento.type == pygame.MOUSEBUTTONUP:
+                # Verifica se o clique foi dentro do retângulo
+                if startButton.collidepoint(evento.pos):
+                    pygame.mixer.music.play(-1)
+                    larguraButtonStart = 350
+                    alturaButtonStart  = 100
+                    jogar()
+                if quitButton.collidepoint(evento.pos):
+                    pygame.mixer.music.play(-1)
+                    larguraButtonQuit = 350
+                    alturaButtonQuit  = 100
+                    quit()
+
+
+        startButton = pygame.draw.rect(tela, branco, (325,400, larguraButtonStart, alturaButtonStart), border_radius=15)
+        startTexto = fonteMenu.render("Jogar novamente", True, preto)
+        tela.blit(startTexto, (400,440))
+        
+        quitButton = pygame.draw.rect(tela, branco, (325,510, larguraButtonQuit, alturaButtonQuit), border_radius=15)
+        quitTexto = fonteMenu.render("Sair do Game", True, preto)
+        tela.blit(quitTexto, (410,540))
+
+        pygame.display.update()
+        relogio.tick(60)
+
+
+def telaBoasVindas():
+    # Carregar fundo da tela de boas-vindas
+    fundoBoasVindas = pygame.image.load("recursos/telaBoasVindas.png")
+    textoBemVindo = fonteNome.render(f"{nome}", True, branco)
+
+    while True:
+        tela.fill(branco)
+        tela.blit(fundoBoasVindas, (0, 0))  # Exibe a imagem de fundo de boas-vindas
+        tela.blit(textoBemVindo, (450,50))
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                quit()
+            elif evento.type == pygame.MOUSEBUTTONDOWN:
+                jogar()
 
         pygame.display.update()
         relogio.tick(60)
 
 
 def start():
+    global ptbr
     ptbr = True
+    def botoes(caminhoButtonPlay, caminhoButtonQuit):
+            global startRect, quitRect, botaoPtBrRect, botaoEnUsRect
+            startButton = pygame.image.load(caminhoButtonPlay)
+            startRect = startButton.get_rect(topleft=(405, 210))
+            tela.blit(startButton, (405,210))
+
+            quitButton = pygame.image.load(caminhoButtonQuit)
+            quitRect = quitButton.get_rect(topleft=(425, 330))
+            tela.blit(quitButton, (425,330))
+
+            botaoPtBr = pygame.image.load("recursos/botaoPTBR.png")
+            botaoPtBrRect = botaoPtBr.get_rect(topleft=(800,15))
+            tela.blit(botaoPtBr, (800,15))
+
+            botaoEnUs = pygame.image.load("recursos/botaoENUS.png")
+            botaoEnUsRect = botaoEnUs.get_rect(topleft=(800,115))
+            tela.blit(botaoEnUs,(800,115))    
+
+
     larguraButtonStart = 355
     alturaButtonStart  = 105
 
@@ -285,51 +387,20 @@ def start():
                     alturaButtonEnUs = 81
                     ptbr = False
                     
-            
-            
         tela.fill(branco)
+        tela.blit(fundoStart,(0,0))
 
         if ptbr:
-            tela.blit(fundoIniciar,(0,0))
-            startButton = pygame.image.load("recursos/botaoIniciar.png")
-            startRect = startButton.get_rect(topleft=(400, 215))
-            tela.blit(startButton, (400,215))
-
-            quitButton = pygame.image.load("recursos/botaoSair.png")
-            quitRect = quitButton.get_rect(topleft=(400, 338))
-            tela.blit(quitButton, (400,338))
-
-            botaoPtBr = pygame.image.load("recursos/botaoPTBR.png")
-            botaoPtBrRect = botaoPtBr.get_rect(topleft=(700,15))
-            tela.blit(botaoPtBr, (800,15))
-
-            botaoEnUs = pygame.image.load("recursos/botaoENUS.png")
-            botaoEnUsRect = botaoEnUs.get_rect(topleft=(700,115))
-            tela.blit(botaoEnUs,(800,115))            
-
-        else:    
-            tela.blit(fundoStart,(0,0))
-            startButton = pygame.image.load("recursos/botaoStartv2.png")
-            startRect = startButton.get_rect(topleft=(405, 210))
-            tela.blit(startButton, (405,210))
-        
-            quitButton = pygame.image.load("recursos/botaoQuitv2.png")
-            quitRect = quitButton.get_rect(topleft=(425, 330))
-            tela.blit(quitButton, (425,330))
-
-            botaoPtBr = pygame.image.load("recursos/botaoPTBR.png")
-            botaoPtBrRect = botaoPtBr.get_rect(topleft=(700,15))
-            tela.blit(botaoPtBr, (800,15))
-
-            botaoEnUs = pygame.image.load("recursos/botaoENUS.png")
-            botaoEnUsRect = botaoEnUs.get_rect(topleft=(700,115))
-            tela.blit(botaoEnUs,(800,115))  
+            botoes("recursos/botaoInicie.png", "recursos/botaoSair.png")
+        else:
+            botoes("recursos/botaoStartv2.png","recursos/botaoQuitv2.png")    
         
         pygame.display.update()
         relogio.tick(60)
 
 
 def perdeu():
+    print("perdeu")
     pygame.mixer.music.stop()
     pygame.mixer.Sound.play(somGameOver)
     
@@ -342,7 +413,7 @@ def perdeu():
     for nome, dados in reversed(ultimosLogs):
         pontos, data, hora = dados
         textoLog = f"{nome} - {pontos} pts - {data} às {hora}"
-        textoLogRender = fonteMorte.render(textoLog, True, preto)
+        textoLogRender = fonteMorte.render(textoLog, True, branco)
         logsRenderizados.append(textoLogRender)
 
 
@@ -361,7 +432,7 @@ def perdeu():
                     larguraButtonStart = 350
                     alturaButtonStart  = 100
                 if quitButton.collidepoint(evento.pos):
-                    larguraButtonQuit = 450
+                    larguraButtonQuit = 350
                     alturaButtonQuit  = 100
 
                 
@@ -379,25 +450,23 @@ def perdeu():
                     quit()
                     
         
-            
-            
-        tela.fill(branco)
-        titulo = fontePontos.render("Últimos Registros", True, preto)
-        tela.blit(titulo,(500,150))
+        tela.blit(fundoPerdeu, (0,0))
+        titulo = fontePontos.render("Últimos Registros", True, branco)
+        tela.blit(titulo,(300,150))
 
-        yOffSet = 100
+        yOffSet = 200
         for linha in logsRenderizados:
-            tela.blit(linha, (150, yOffSet))
+            tela.blit(linha, (200, yOffSet))
             yOffSet += 40
 
         
-        startButton = pygame.draw.rect(tela, branco, (10,10, larguraButtonStart, alturaButtonStart), border_radius=15)
-        startTexto = fonteMenu.render("Iniciar Game", True, preto)
-        tela.blit(startTexto, (25,12))
+        startButton = pygame.draw.rect(tela, branco, (325,400, larguraButtonStart, alturaButtonStart), border_radius=15)
+        startTexto = fonteMenu.render("Jogar novamente", True, preto)
+        tela.blit(startTexto, (400,440))
         
-        quitButton = pygame.draw.rect(tela, branco, (10,60, larguraButtonQuit, alturaButtonQuit), border_radius=15)
+        quitButton = pygame.draw.rect(tela, branco, (325,510, larguraButtonQuit, alturaButtonQuit), border_radius=15)
         quitTexto = fonteMenu.render("Sair do Game", True, preto)
-        tela.blit(quitTexto, (25,62))
+        tela.blit(quitTexto, (410,540))
 
 
         pygame.display.update()
