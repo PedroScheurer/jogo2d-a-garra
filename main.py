@@ -25,17 +25,15 @@ maquinaCima = pygame.image.load("recursos/telaJogoMaquinaCima.png")
 joyStick = pygame.image.load("recursos/telaJoySticksemfundo.png")
 fundoPause = pygame.image.load("recursos/paused.png")
 buracoUrso = pygame.image.load("recursos/buracoUrso.png")
-#fundoDead = pygame.image.load("assets/fundoDead.png")
-#urso = pygame.image.load("recursos/ursinho.png")
-#missileSound = pygame.mixer.Sound("assets/missile.wav")
-#explosaoSound = pygame.mixer.Sound("assets/explosao.wav")
+somCaptura = pygame.mixer.Sound("recursos/pickup_2.wav")
+somGameOver = pygame.mixer.Sound("recursos/game_over.wav")
 somClique = pygame.mixer.Sound("recursos/click.wav")
 somPegar = pygame.mixer.Sound("recursos/pickup_2.wav")
-fonteMenu = pygame.font.Font("recursos/PressStart2P.ttf",24)
-fonteMorte = pygame.font.Font("recursos/PressStart2P.ttf",24)
+fonteMenu = pygame.font.Font("recursos/PressStart2P.ttf",18)
+fontePontos = pygame.font.Font("recursos/PressStart2P.ttf",24)
+fonteMorte = pygame.font.Font("recursos/PressStart2P.ttf",18)
 pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
-botaoPTBR = pygame.image.load("recursos/botaoPTBR.png")
-botaoENUS = pygame.image.load("recursos/botaoENUS.png")
+
 
 
 def jogar():
@@ -137,10 +135,10 @@ def jogar():
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
                 pause = True
                 while pause:
-                    tela.blit(fundoPause, (0,0) )
+                    tela.blit(fundoPause, (0,0))
                     pygame.display.update()
         
-                    for eventoPausa in eventos:
+                    for eventoPausa in pygame.event.get():
                         if eventoPausa.type == pygame.QUIT:
                             pygame.quit()
                             exit()
@@ -177,15 +175,15 @@ def jogar():
         tela.blit(joyStick,(190,415))
 
         if ptbr:
-            texto = fonteMenu.render("Pontos: "+str(pontos), True, branco)
+            texto = fontePontos.render("Pontos: "+str(pontos), True, branco)
         else:
-            texto = fonteMenu.render("Points: "+str(pontos), True, branco)
-        tela.blit(texto, (15,15))
+            texto = fontePontos.render("Points: "+str(pontos), True, branco)
+        tela.blit(texto, (500,65))
         if ptbr:
             texto = fonteMenu.render("Pressione Espaço para Pausar o Jogo", True, branco)
         else:
             texto = fonteMenu.render("Press Space to Pause Game", True, branco)
-        tela.blit(texto, (15,45))
+        tela.blit(texto, (15,15))
         
         garraRect = pygame.Rect(posicaoXGarra, posicaoYGarra, larguraGarra, alturaGarra)
 
@@ -206,24 +204,25 @@ def jogar():
                             pygame.mixer.music.play(-1)
                         ursoSelecionado = nomeUrso
                         break   
-        
-        tela.blit(buracoUrso, (posicaoXBuraco, posicaoYBuraco))
 
         if ursoSelecionado:
-            ursos[ursoSelecionado][1] = posicaoXGarra
-            ursos[ursoSelecionado][2] = posicaoYGarra + alturaGarra
+            ursos[ursoSelecionado][1] = posicaoXGarra + 10
+            ursos[ursoSelecionado][2] = posicaoYGarra + alturaGarra - 10
         
             if posicaoXBuraco + 45 < ursos[ursoSelecionado][1] + 45 < posicaoXBuraco + larguraBuraco:
-                if ursos[ursoSelecionado][2] + 50 == posicaoYBuraco:
+                if ursos[ursoSelecionado][2] + 25 == posicaoYBuraco:
                     ursosPegos.append(ursoSelecionado)
+                    ursos[ursoSelecionado][1] = 0
+                    ursos[ursoSelecionado][2] = 0
+                    pygame.mixer.Sound.play(somPegar)
             
         for ursoPego in ursosPegos:
             if ursoPego in ursosVogais.keys():
-                pontos += 1
-                ursosVogaisPegos.append(ursoPego)
-                ursosPegos.remove(ursosPegos)
-            else:
-                dead()
+                if ursoPego not in ursosVogaisPegos:
+                    ursosVogaisPegos.append(ursoPego)
+                    pontos = len(ursosVogaisPegos)
+            elif len(ursosPegos) > 2:
+                perdeu()
 
 
         pygame.display.update()
@@ -237,6 +236,12 @@ def start():
 
     larguraButtonQuit = 330
     alturaButtonQuit  = 100
+
+    larguraButtonPtBr = 150
+    alturaButtonPtBr = 84
+
+    larguraButtonEnUs = 150
+    alturaButtonEnUs = 81
     
 
     while True:
@@ -244,13 +249,18 @@ def start():
             if evento.type == pygame.QUIT:
                 quit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
-
                 if startRect.collidepoint(evento.pos):
                     larguraButtonStart = 355
                     alturaButtonStart  = 105
                 if quitRect.collidepoint(evento.pos):
                     larguraButtonQuit = 330
                     alturaButtonQuit  = 110
+                if botaoPtBrRect.collidepoint(evento.pos):
+                    larguraButtonPtBr = 150
+                    alturaButtonPtBr = 84
+                if botaoEnUsRect.collidepoint(evento.pos):
+                    larguraButtonEnUs = 150
+                    alturaButtonEnUs = 81
                 
             elif evento.type == pygame.MOUSEBUTTONUP:
                 # Verifica se o clique foi dentro do retângulo
@@ -266,6 +276,14 @@ def start():
                     alturaButtonQuit  = 110
                     pygame.mixer.Sound.play(somClique)
                     quit()
+                if botaoPtBrRect.collidepoint(evento.pos):
+                    larguraButtonPtBr = 150
+                    alturaButtonPtBr = 84
+                    ptbr = True
+                if botaoEnUsRect.collidepoint(evento.pos):
+                    larguraButtonEnUs = 150
+                    alturaButtonEnUs = 81
+                    ptbr = False
                     
             
             
@@ -273,19 +291,24 @@ def start():
 
         if ptbr:
             tela.blit(fundoIniciar,(0,0))
-            tela.blit(botaoPTBR,(800,15))
-            tela.blit(botaoENUS,(800,115))
             startButton = pygame.image.load("recursos/botaoIniciar.png")
             startRect = startButton.get_rect(topleft=(400, 215))
             tela.blit(startButton, (400,215))
 
             quitButton = pygame.image.load("recursos/botaoSair.png")
-            quitRect = quitButton.get_rect(topleft=(400, 335))
-            tela.blit(quitButton, (400,335))
+            quitRect = quitButton.get_rect(topleft=(400, 338))
+            tela.blit(quitButton, (400,338))
+
+            botaoPtBr = pygame.image.load("recursos/botaoPTBR.png")
+            botaoPtBrRect = botaoPtBr.get_rect(topleft=(700,15))
+            tela.blit(botaoPtBr, (800,15))
+
+            botaoEnUs = pygame.image.load("recursos/botaoENUS.png")
+            botaoEnUsRect = botaoEnUs.get_rect(topleft=(700,115))
+            tela.blit(botaoEnUs,(800,115))            
+
         else:    
             tela.blit(fundoStart,(0,0))
-            tela.blit(botaoPTBR,(750,15))
-            tela.blit(botaoENUS,(750,115))
             startButton = pygame.image.load("recursos/botaoStartv2.png")
             startRect = startButton.get_rect(topleft=(405, 210))
             tela.blit(startButton, (405,210))
@@ -293,38 +316,42 @@ def start():
             quitButton = pygame.image.load("recursos/botaoQuitv2.png")
             quitRect = quitButton.get_rect(topleft=(425, 330))
             tela.blit(quitButton, (425,330))
+
+            botaoPtBr = pygame.image.load("recursos/botaoPTBR.png")
+            botaoPtBrRect = botaoPtBr.get_rect(topleft=(700,15))
+            tela.blit(botaoPtBr, (800,15))
+
+            botaoEnUs = pygame.image.load("recursos/botaoENUS.png")
+            botaoEnUsRect = botaoEnUs.get_rect(topleft=(700,115))
+            tela.blit(botaoEnUs,(800,115))  
         
         pygame.display.update()
         relogio.tick(60)
 
 
-def dead():
+def perdeu():
     pygame.mixer.music.stop()
-  #  pygame.mixer.Sound.play(explosaoSound)
+    pygame.mixer.Sound.play(somGameOver)
+    
+    with open("log.dat", "r") as arquivo:
+        log_partidas = json.load(arquivo)
+
+    ultimosLogs = list(log_partidas.items())[-5:]    
+    
+    logsRenderizados = []
+    for nome, dados in reversed(ultimosLogs):
+        pontos, data, hora = dados
+        textoLog = f"{nome} - {pontos} pts - {data} às {hora}"
+        textoLogRender = fonteMorte.render(textoLog, True, preto)
+        logsRenderizados.append(textoLogRender)
+
+
+
     larguraButtonStart = 350
     alturaButtonStart  = 100
     larguraButtonQuit = 350
     alturaButtonQuit  = 100
     
-    
-    root = tk.Tk()
-    root.title("Tela da Morte")
-
-    # Adiciona um título na tela
-    label = tk.Label(root, text="Log das Partidas", font=("Arial", 16))
-    label.pack(pady=10)
-
-    # Criação do Listbox para mostrar o log
-    listbox = tk.Listbox(root, width=75, height=10, selectmode=tk.SINGLE)
-    listbox.pack(pady=20)
-
-    # Adiciona o log das partidas no Listbox
-    log_partidas = open("base.atitus", "r").read()
-    log_partidas = json.loads(log_partidas)
-    for chave in log_partidas:
-        listbox.insert(tk.END, f"Pontos: {log_partidas[chave][0]} na data: {log_partidas[chave][1]} na hora: {log_partidas[chave][2]} - Nickname: {chave} ")  # Adiciona cada linha no Listbox
-    
-    root.mainloop()
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -355,6 +382,13 @@ def dead():
             
             
         tela.fill(branco)
+        titulo = fontePontos.render("Últimos Registros", True, preto)
+        tela.blit(titulo,(500,150))
+
+        yOffSet = 100
+        for linha in logsRenderizados:
+            tela.blit(linha, (150, yOffSet))
+            yOffSet += 40
 
         
         startButton = pygame.draw.rect(tela, branco, (10,10, larguraButtonStart, alturaButtonStart), border_radius=15)
