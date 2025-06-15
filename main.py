@@ -1,6 +1,4 @@
-import pygame
-import random
-import os
+import pygame, random, os, math
 import tkinter as tk
 from tkinter import messagebox
 from recursos.funcoes import inicializarBancoDeDados
@@ -13,7 +11,7 @@ tamanho = (1000,700)
 relogio = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho) 
 pygame.display.set_caption("A Garra")
-icone  = pygame.image.load("recursos/garraLongasemfundo.png")
+icone  = pygame.image.load("recursos/ursinho_dourado.png")
 pygame.display.set_icon(icone)
 branco = (255,255,255)
 preto = (0, 0 ,0 )
@@ -111,6 +109,29 @@ def jogar():
     ursosPegos = []
     ursosVogaisPegos = []
     ursosConsoantesPegos = []
+
+    urso_img = pygame.image.load("recursos/ursinho_dourado.png").convert_alpha()
+    tamanho = 64
+    urso_img = pygame.transform.scale(urso_img, (tamanho, tamanho))
+
+    ursoAleatorioXMin = 375
+    ursoAleatorioXMax = 550
+    ursoAleatorioYMin = 500
+    ursoAleatorioYMax = 575
+
+    # Posição inicial aleatória
+    x = random.randint(ursoAleatorioXMin, ursoAleatorioXMax)
+    y = random.randint(ursoAleatorioYMin, ursoAleatorioYMax)
+
+    # Direção de movimento aleatória
+    velocidade = 0.5
+    dx = random.uniform(-1, 1)
+    dy = random.uniform(-1, 1)
+
+
+        # Temporizador para trocar a direção
+    tempo_mudanca = 5000  # a cada 2 segundos
+    ultimo_tempo = pygame.time.get_ticks()
 
     while True:
         eventos = pygame.event.get()
@@ -235,6 +256,26 @@ def jogar():
         if len(ursosVogaisPegos) == 5:
             print("vitoria")
             telaVitoria()
+
+        # Mover o ursinho
+        x += dx * velocidade
+        y += dy * velocidade
+
+
+        if x < ursoAleatorioXMin or x > ursoAleatorioXMax:
+            dx *= -1
+        if y < ursoAleatorioYMin or y > ursoAleatorioYMax:
+            dy *= -1
+
+        # Trocar direção a cada intervalo de tempo
+        agora = pygame.time.get_ticks()
+        if agora - ultimo_tempo > tempo_mudanca:
+            dx = random.uniform(-1, 1)
+            dy = random.uniform(-1, 1)
+            ultimo_tempo = agora
+
+        # Desenhar o ursinho na tela
+        tela.blit(urso_img, (int(x - tamanho // 2), int(y - tamanho // 2)))
 
         pygame.display.update()
         relogio.tick(60)
