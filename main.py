@@ -1,8 +1,10 @@
-import pygame, random, os, math
+import pygame, random, math
 import tkinter as tk
 from tkinter import messagebox
 from recursos.funcoes import inicializarBancoDeDados
 from recursos.funcoes import escreverDados
+from recursos.funcoesVoz import ouvir
+from recursos.funcoesVoz import falar
 import json
 
 pygame.init()
@@ -23,6 +25,7 @@ maquinaCima = pygame.image.load("recursos/telaJogoMaquinaCima.png")
 joyStick = pygame.image.load("recursos/telaJoySticksemfundo.png")
 fundoPause = pygame.image.load("recursos/paused.png")
 buracoUrso = pygame.image.load("recursos/buracoUrso.png")
+engrenagem = pygame.image.load("recursos/engrenagemSemfundo.png").convert_alpha()
 somCaptura = pygame.mixer.Sound("recursos/pickup_2.wav")
 somGameOver = pygame.mixer.Sound("recursos/game_over.wav")
 somClique = pygame.mixer.Sound("recursos/click.wav")
@@ -31,6 +34,7 @@ fonteMenu = pygame.font.Font("recursos/PressStart2P.ttf",14)
 fontePontos = pygame.font.Font("recursos/PressStart2P.ttf",24)
 fonteMorte = pygame.font.Font("recursos/PressStart2P.ttf",18)
 fonteNome = pygame.font.Font("recursos/PressStart2P.ttf",42)
+pygame.mixer.music.set_volume(0.25)
 pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
 nomeDigitado = False
 
@@ -73,7 +77,6 @@ def jogar():
         # Inicia o loop da interface gráfica
         root.mainloop()
     
-    cadastroRealizado = True
     posicaoXGarra = 500
     posicaoYGarra = -200
     movimentoXGarra  = 0
@@ -129,9 +132,13 @@ def jogar():
     dy = random.uniform(-1, 1)
 
 
-        # Temporizador para trocar a direção
-    tempo_mudanca = 5000  # a cada 2 segundos
+    # Temporizador para trocar a direção
+    tempo_mudanca = 5000
     ultimo_tempo = pygame.time.get_ticks()
+
+    angulo = 0
+    tempo = 0
+    raio_base = 64
 
     while True:
         eventos = pygame.event.get()
@@ -277,6 +284,22 @@ def jogar():
         # Desenhar o ursinho na tela
         tela.blit(urso_img, (int(x - tamanho // 2), int(y - tamanho // 2)))
 
+
+        # Atualiza o ângulo e o fator de escala (pulsação)
+        angulo += 0.75
+        tempo += 0.05
+        escala = 1 + 0.1 * math.sin(tempo)  # Efeito de pulsar
+        tamanho = int(raio_base * 2 * escala)
+        
+        # Redimensiona e rotaciona a imagem
+        engrenagem_escalada = pygame.transform.smoothscale(engrenagem, (tamanho, tamanho))
+        engrenagem_rotacionada = pygame.transform.rotate(engrenagem_escalada, angulo)
+
+        # Calcula posição para o canto superior direito
+        engrenagem_rect = engrenagem_rotacionada.get_rect(topright=(1050, -50))
+
+        tela.blit(engrenagem_rotacionada, engrenagem_rect)
+
         pygame.display.update()
         relogio.tick(60)
 
@@ -336,6 +359,7 @@ def telaBoasVindas():
     # Carregar fundo da tela de boas-vindas
     fundoBoasVindas = pygame.image.load("recursos/telaBoasVindas.png")
     textoBemVindo = fonteNome.render(f"{nome}", True, branco)
+    falar("Bem vindo", nome)
 
     while True:
         tela.fill(branco)
