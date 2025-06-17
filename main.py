@@ -15,28 +15,28 @@ tamanho = (1000,700)
 relogio = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho) 
 pygame.display.set_caption("A Garra")
-icone  = pygame.image.load("recursos/icoUrsinho_dourado.ico")
+icone  = pygame.image.load("recursos/imagens/icoUrsinho_dourado.ico")
 pygame.display.set_icon(icone)
 branco = (255,255,255)
 preto = (0, 0 ,0 )
-garra = pygame.image.load("recursos/garraLongasemfundo.png")
-fundoStart = pygame.image.load("recursos/startAndQuit.png")
-fundoJogo = pygame.image.load("recursos/telaJogo.png")
-fundoPerdeu = pygame.image.load("recursos/telaPerdeu.png")
-maquinaCima = pygame.image.load("recursos/telaJogoMaquinaCima.png")
-joyStick = pygame.image.load("recursos/telaJoySticksemfundo.png")
-buracoUrso = pygame.image.load("recursos/buracoUrso.png")
-engrenagem = pygame.image.load("recursos/engrenagemSemfundo.png").convert_alpha()
-somCaptura = pygame.mixer.Sound("recursos/pickup_2.wav")
-somGameOver = pygame.mixer.Sound("recursos/game_over.wav")
-somClique = pygame.mixer.Sound("recursos/click.wav")
-somPegar = pygame.mixer.Sound("recursos/pickup_2.wav")
-fonteMenu = pygame.font.Font("recursos/PressStart2P.ttf",14)
-fontePontos = pygame.font.Font("recursos/PressStart2P.ttf",24)
-fonteMorte = pygame.font.Font("recursos/PressStart2P.ttf",18)
-fonteNome = pygame.font.Font("recursos/PressStart2P.ttf",42)
+garra = pygame.image.load("recursos/imagens/garraLongasemfundo.png")
+fundoStart = pygame.image.load("recursos/imagens/startAndQuit.png")
+fundoJogo = pygame.image.load("recursos/imagens/telaJogo.png")
+fundoPerdeu = pygame.image.load("recursos/imagens/telaPerdeu.png")
+maquinaCima = pygame.image.load("recursos/imagens/telaJogoMaquinaCima.png")
+joyStick = pygame.image.load("recursos/imagens/telaJoySticksemfundo.png")
+buracoUrso = pygame.image.load("recursos/imagens/buracoUrso.png")
+engrenagem = pygame.image.load("recursos/imagens/engrenagemSemfundo.png").convert_alpha()
+somCaptura = pygame.mixer.Sound("recursos/sons/pickup_2.wav")
+somGameOver = pygame.mixer.Sound("recursos/sons/game_over.wav")
+somClique = pygame.mixer.Sound("recursos/sons/click.wav")
+somPegar = pygame.mixer.Sound("recursos/sons/pickup_2.wav")
+fonteMenu = pygame.font.Font("recursos/fontes/PressStart2P.ttf",14)
+fontePontos = pygame.font.Font("recursos/fontes/PressStart2P.ttf",24)
+fonteMorte = pygame.font.Font("recursos/fontes/PressStart2P.ttf",18)
+fonteNome = pygame.font.Font("recursos/fontes/PressStart2P.ttf",42)
 pygame.mixer.music.set_volume(0.25)
-pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
+pygame.mixer.music.load("recursos/sons/Boppy1minloop.mp3")
 nomeDigitado = False
 falaResultado = None
 fila_falas = Queue()
@@ -101,18 +101,18 @@ def jogar():
     ursoSelecionado = None
 
     ursosVogais = {
-        "ursoA" : [pygame.image.load("recursos/ursoAsemfundoPequeno.png"), random.randint(160,170),280],
-        "ursoE" : [pygame.image.load("recursos/ursoEsemfundoPequeno.png"), random.randint(270,280),280],
-        "ursoI" : [pygame.image.load("recursos/ursoIsemfundoPequeno.png"), random.randint(380,390),280],
-        "ursoO" : [pygame.image.load("recursos/ursoOsemfundoPequeno.png"), random.randint(470,480),280],
-        "ursoU" : [pygame.image.load("recursos/ursoUsemfundoPequeno.png"), random.randint(585,595),280],
+        "ursoA" : [pygame.image.load("recursos/imagens/ursoAsemfundoPequeno.png"), random.randint(160,170),280],
+        "ursoE" : [pygame.image.load("recursos/imagens/ursoEsemfundoPequeno.png"), random.randint(270,280),280],
+        "ursoI" : [pygame.image.load("recursos/imagens/ursoIsemfundoPequeno.png"), random.randint(380,390),280],
+        "ursoO" : [pygame.image.load("recursos/imagens/ursoOsemfundoPequeno.png"), random.randint(470,480),280],
+        "ursoU" : [pygame.image.load("recursos/imagens/ursoUsemfundoPequeno.png"), random.randint(585,595),280],
     }
     ursosConsoantes = {
-        "ursoH" : [pygame.image.load("recursos/ursoHsemfundoPequeno.png"), random.randint(100,120),315],
-        "ursoJ" : [pygame.image.load("recursos/ursoJsemfundoPequeno.png"), random.randint(230,240),300],
-        "ursoK" : [pygame.image.load("recursos/ursoKsemfundoPequeno.png"), random.randint(330,340),315],
-        "ursoB" : [pygame.image.load("recursos/ursoBsemfundoPequeno.png"), random.randint(430,440),315],
-        "ursoG" : [pygame.image.load("recursos/ursoGsemfundoPequeno.png"), random.randint(535,545),315],
+        "ursoH" : [pygame.image.load("recursos/imagens/ursoHsemfundoPequeno.png"), random.randint(100,120),315],
+        "ursoJ" : [pygame.image.load("recursos/imagens/ursoJsemfundoPequeno.png"), random.randint(230,240),300],
+        "ursoK" : [pygame.image.load("recursos/imagens/ursoKsemfundoPequeno.png"), random.randint(330,340),315],
+        "ursoB" : [pygame.image.load("recursos/imagens/ursoBsemfundoPequeno.png"), random.randint(430,440),315],
+        "ursoG" : [pygame.image.load("recursos/imagens/ursoGsemfundoPequeno.png"), random.randint(535,545),315],
     }
 
     ursos = {**ursosVogais, **ursosConsoantes}
@@ -120,7 +120,7 @@ def jogar():
     ursosVogaisPegos = []
     ursosConsoantesPegos = []
 
-    ursoDourado = pygame.image.load("recursos/ursinho_dourado.png").convert_alpha()
+    ursoDourado = pygame.image.load("recursos/imagens/ursinho_dourado.png").convert_alpha()
     tamanho = 36
     ursoDourado = pygame.transform.scale(ursoDourado, (tamanho, tamanho))
 
@@ -176,9 +176,9 @@ def jogar():
                 pause = True
                 while pause:
                     if ptbr:
-                        fundoPause = pygame.image.load("recursos/pausado.png")
+                        fundoPause = pygame.image.load("recursos/imagens/pausado.png")
                     else:
-                        fundoPause = pygame.image.load("recursos/paused.png")
+                        fundoPause = pygame.image.load("recursos/imagens/paused.png")
                     tela.blit(fundoPause, (0,0))
                     pygame.display.update()
         
@@ -316,9 +316,9 @@ def jogar():
 
 def telaVitoria():
     if ptbr:
-        fundoVitoria = pygame.image.load("recursos/telaVitoria.png")
+        fundoVitoria = pygame.image.load("recursos/imagens/telaVitoria.png")
     else:
-        fundoVitoria = pygame.image.load("recursos/telaVictory.png")
+        fundoVitoria = pygame.image.load("recursos/imagens/telaVictory.png")
     textoVitoria = fonteNome.render(f"{nome}", True, branco)
 
     larguraButtonStart = 350
@@ -379,9 +379,9 @@ def telaVitoria():
 def telaBoasVindas():
     # Carregar fundo da tela de boas-vindas
     if ptbr:
-        fundoBoasVindas = pygame.image.load("recursos/telaBoasVindas.png")
+        fundoBoasVindas = pygame.image.load("recursos/imagens/telaBoasVindas.png")
     else:
-        fundoBoasVindas = pygame.image.load("recursos/telaWelcome.png")
+        fundoBoasVindas = pygame.image.load("recursos/imagens/telaWelcome.png")
     textoBemVindo = fonteNome.render(f"{nome}", True, branco)
     falar("Bem vindo", nome) if ptbr else falar("Welcome", nome)
 
@@ -414,11 +414,11 @@ def start():
             quitRect = quitButton.get_rect(topleft=(425, 330))
             tela.blit(quitButton, (425,330))
 
-            botaoPtBr = pygame.image.load("recursos/botaoPTBR.png")
+            botaoPtBr = pygame.image.load("recursos/imagens/botaoPTBR.png")
             botaoPtBrRect = botaoPtBr.get_rect(topleft=(800,15))
             tela.blit(botaoPtBr, (800,15))
 
-            botaoEnUs = pygame.image.load("recursos/botaoENUS.png")
+            botaoEnUs = pygame.image.load("recursos/imagens/botaoENUS.png")
             botaoEnUsRect = botaoEnUs.get_rect(topleft=(800,115))
             tela.blit(botaoEnUs,(800,115))    
 
@@ -441,7 +441,7 @@ def start():
         tela.fill(branco)
         tela.blit(fundoStart,(0,0))
 
-        botoes("recursos/botaoInicie.png", "recursos/botaoSair.png") if ptbr else botoes("recursos/botaoStartv2.png","recursos/botaoQuitv2.png")
+        botoes("recursos/imagens/botaoInicie.png", "recursos/imagens/botaoSair.png") if ptbr else botoes("recursos/imagens/botaoStartv2.png","recursos/imagens/botaoQuitv2.png")
         
         pygame.display.update()
         relogio.tick(60)
@@ -488,8 +488,6 @@ def start():
 
         if not fila_falas.empty():
             fala = fila_falas.get().strip().lower()
-            print(f"[DEBUG TESTE] Fala recebida da fila: {fala}")
-
             if any(p in fala for p in ["começar", "iniciar", "jogar"]):
                 pygame.mixer.music.play(-1)
                 pygame.mixer.Sound.play(somClique)
