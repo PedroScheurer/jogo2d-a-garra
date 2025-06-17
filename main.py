@@ -1,4 +1,4 @@
-import pygame, random, math
+import pygame, random, math, threading
 import tkinter as tk
 from tkinter import messagebox
 from recursos.funcoes import inicializarBancoDeDados
@@ -6,6 +6,7 @@ from recursos.funcoes import escreverDados
 from recursos.funcoesVoz import ouvir
 from recursos.funcoesVoz import falar
 import json
+
 
 pygame.init()
 inicializarBancoDeDados()
@@ -37,6 +38,7 @@ fonteNome = pygame.font.Font("recursos/PressStart2P.ttf",42)
 pygame.mixer.music.set_volume(0.25)
 pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
 nomeDigitado = False
+falaResultado = None
 
 
 def jogar():
@@ -47,7 +49,7 @@ def jogar():
             global nome, nomeDigitado
             nome = entry_nome.get()  # Obtém o texto digitado
             if not nome:  # Se o campo estiver vazio
-                messagebox.showwarning("Aviso", "Por favor, digite seu nome!")  # Exibe uma mensagem de aviso
+                messagebox.showwarning("Aviso", "Por favor, digite seu nome!") if ptbr else messagebox.showwarning("Alert", "Please, type your name!")
             else:
                 nomeDigitado = True
                 #print(f'Nome digitado: {nome}')  # Exibe o nome no console
@@ -63,7 +65,7 @@ def jogar():
         pos_x = (largura_tela - largura_janela) // 2
         pos_y = (altura_tela - altura_janela) // 2
         root.geometry(f"{largura_janela}x{altura_janela}+{pos_x}+{pos_y}")
-        root.title("Informe seu nickname")
+        root.title("Informe seu nickname") if ptbr else root.title("Enter your nickname")
         root.protocol("WM_DELETE_WINDOW", obter_nome)
 
         # Entry (campo de texto)
@@ -71,7 +73,10 @@ def jogar():
         entry_nome.pack()
 
         # Botão para pegar o nome
-        botao = tk.Button(root, text="Enviar", command=obter_nome)
+        if ptbr:
+            botao = tk.Button(root, text="Enviar", command=obter_nome)
+        else:
+            botao = tk.Button(root, text="Send", command=obter_nome)
         botao.pack()
 
         # Inicia o loop da interface gráfica
@@ -114,13 +119,13 @@ def jogar():
     ursosConsoantesPegos = []
 
     urso_img = pygame.image.load("recursos/ursinho_dourado.png").convert_alpha()
-    tamanho = 64
+    tamanho = 36
     urso_img = pygame.transform.scale(urso_img, (tamanho, tamanho))
 
-    ursoAleatorioXMin = 375
-    ursoAleatorioXMax = 550
-    ursoAleatorioYMin = 500
-    ursoAleatorioYMax = 575
+    ursoAleatorioXMin = 750
+    ursoAleatorioXMax = 900
+    ursoAleatorioYMin = 469
+    ursoAleatorioYMax = 470
 
     # Posição inicial aleatória
     x = random.randint(ursoAleatorioXMin, ursoAleatorioXMax)
@@ -206,16 +211,17 @@ def jogar():
         tela.blit(garra, (posicaoXGarra, posicaoYGarra))
         tela.blit(maquinaCima,(1,0))
         tela.blit(joyStick,(190,415))
-
         if ptbr:
-            texto = fontePontos.render("Pontos: "+str(pontos), True, branco)
+            texto = fontePontos.render("Pontos: "+str(pontos), True, branco) 
         else:
             texto = fontePontos.render("Points: "+str(pontos), True, branco)
+
         tela.blit(texto, (470,65))
         if ptbr:
-            texto = fonteMenu.render("Pressione Espaço para Pausar o Jogo", True, branco)
-        else:
+            texto = fonteMenu.render("Pressione Espaço para Pausar o Jogo", True, branco) 
+        else: 
             texto = fonteMenu.render("Press Space to Pause Game", True, branco)
+        
         tela.blit(texto, (15,15))
         
         garraRect = pygame.Rect(posicaoXGarra, posicaoYGarra, larguraGarra, alturaGarra)
@@ -240,6 +246,8 @@ def jogar():
         if ursoSelecionado:
             ursos[ursoSelecionado][1] = posicaoXGarra + 10
             ursos[ursoSelecionado][2] = posicaoYGarra + alturaGarra - 10
+            if ursos[ursoSelecionado][2] > 335:
+                ursos[ursoSelecionado][2] = 330
         
             if posicaoXBuraco + 45 < ursos[ursoSelecionado][1] + 45 < posicaoXBuraco + larguraBuraco:
                 if ursos[ursoSelecionado][2] + 60 == posicaoYBuraco:
@@ -260,14 +268,13 @@ def jogar():
             escreverDados(nome, pontos)
             perdeu()
 
-        if len(ursosVogaisPegos) == 5:
+        if len(ursosVogaisPegos) == 1:
             print("vitoria")
             telaVitoria()
 
         # Mover o ursinho
         x += dx * velocidade
         y += dy * velocidade
-
 
         if x < ursoAleatorioXMin or x > ursoAleatorioXMax:
             dx *= -1
@@ -316,7 +323,7 @@ def telaVitoria():
     while True:
         tela.fill(branco)
         tela.blit(fundoVitoria, (0, 0))  # Exibe a imagem de fundo de boas-vindas
-        tela.blit(textoVitoria, (500,180))
+        tela.blit(textoVitoria, (425,180))
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -344,12 +351,20 @@ def telaVitoria():
 
 
         startButton = pygame.draw.rect(tela, branco, (325,400, larguraButtonStart, alturaButtonStart), border_radius=15)
-        startTexto = fonteMenu.render("Jogar novamente", True, preto)
+        if ptbr:
+            startTexto = fonteMenu.render("Jogar novamente", True, preto) 
+        else: 
+            startTexto = fonteMenu.render("Play Again", True, preto)
+        
         tela.blit(startTexto, (400,440))
         
         quitButton = pygame.draw.rect(tela, branco, (325,510, larguraButtonQuit, alturaButtonQuit), border_radius=15)
-        quitTexto = fonteMenu.render("Sair do Game", True, preto)
-        tela.blit(quitTexto, (410,540))
+        if ptbr:
+            quitTexto = fonteMenu.render("Sair do Jogo", True, preto)
+        else:
+            quitTexto = fonteMenu.render("Quit Game", True, preto)
+        
+        tela.blit(quitTexto, (410,545))
 
         pygame.display.update()
         relogio.tick(60)
@@ -359,7 +374,7 @@ def telaBoasVindas():
     # Carregar fundo da tela de boas-vindas
     fundoBoasVindas = pygame.image.load("recursos/telaBoasVindas.png")
     textoBemVindo = fonteNome.render(f"{nome}", True, branco)
-    falar("Bem vindo", nome)
+    falar("Bem vindo", nome) if ptbr else falar("Welcome", nome)
 
     while True:
         tela.fill(branco)
@@ -397,6 +412,8 @@ def start():
             botaoEnUsRect = botaoEnUs.get_rect(topleft=(800,115))
             tela.blit(botaoEnUs,(800,115))    
 
+    thread_voz = threading.Thread(target=ouvir)
+    thread_voz.start()
 
     larguraButtonStart = 355
     alturaButtonStart  = 105
@@ -409,9 +426,16 @@ def start():
 
     larguraButtonEnUs = 150
     alturaButtonEnUs = 81
-    
 
     while True:
+        tela.fill(branco)
+        tela.blit(fundoStart,(0,0))
+
+        botoes("recursos/botaoInicie.png", "recursos/botaoSair.png") if ptbr else botoes("recursos/botaoStartv2.png","recursos/botaoQuitv2.png")
+        
+        pygame.display.update()
+        relogio.tick(60)
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 quit()
@@ -419,13 +443,13 @@ def start():
                 if startRect.collidepoint(evento.pos):
                     larguraButtonStart = 355
                     alturaButtonStart  = 105
-                if quitRect.collidepoint(evento.pos):
+                elif quitRect.collidepoint(evento.pos):
                     larguraButtonQuit = 330
                     alturaButtonQuit  = 110
-                if botaoPtBrRect.collidepoint(evento.pos):
+                elif botaoPtBrRect.collidepoint(evento.pos):
                     larguraButtonPtBr = 150
                     alturaButtonPtBr = 84
-                if botaoEnUsRect.collidepoint(evento.pos):
+                elif botaoEnUsRect.collidepoint(evento.pos):
                     larguraButtonEnUs = 150
                     alturaButtonEnUs = 81
                 
@@ -437,31 +461,31 @@ def start():
                     alturaButtonStart  = 105
                     pygame.mixer.Sound.play(somClique)
                     jogar()
-                if quitRect.collidepoint(evento.pos):
+                elif quitRect.collidepoint(evento.pos):
                     pygame.mixer.music.play(-1)
                     larguraButtonQuit = 330
                     alturaButtonQuit  = 110
                     pygame.mixer.Sound.play(somClique)
                     quit()
-                if botaoPtBrRect.collidepoint(evento.pos):
+                elif botaoPtBrRect.collidepoint(evento.pos):
                     larguraButtonPtBr = 150
                     alturaButtonPtBr = 84
                     ptbr = True
-                if botaoEnUsRect.collidepoint(evento.pos):
+                elif botaoEnUsRect.collidepoint(evento.pos):
                     larguraButtonEnUs = 150
                     alturaButtonEnUs = 81
                     ptbr = False
-                    
-        tela.fill(branco)
-        tela.blit(fundoStart,(0,0))
-
-        if ptbr:
-            botoes("recursos/botaoInicie.png", "recursos/botaoSair.png")
-        else:
-            botoes("recursos/botaoStartv2.png","recursos/botaoQuitv2.png")    
-        
-        pygame.display.update()
-        relogio.tick(60)
+                else:
+                    if falaResultado:
+                        if "começar" in falaResultado or "iniciar" in falaResultado or "start" in falaResultado:
+                            pygame.mixer.music.play(-1)
+                            pygame.mixer.Sound.play(somClique)
+                            jogar()
+                        elif "sair" in falaResultado or "fechar" in falaResultado or "quit" in falaResultado:
+                            pygame.mixer.music.play(-1)
+                            pygame.mixer.Sound.play(somClique)
+                            quit()
+                        falaResultado = None
 
 
 def perdeu():
@@ -516,7 +540,10 @@ def perdeu():
                     
         
         tela.blit(fundoPerdeu, (0,0))
-        titulo = fontePontos.render("Últimos Registros", True, branco)
+        if ptbr:
+            titulo = fontePontos.render("Últimos Registros", True, branco)
+        else:
+            titulo = fontePontos.render("Latest Entries", True, branco)
         tela.blit(titulo,(300,150))
 
         yOffSet = 200
@@ -526,12 +553,18 @@ def perdeu():
 
         
         startButton = pygame.draw.rect(tela, branco, (325,400, larguraButtonStart, alturaButtonStart), border_radius=15)
-        startTexto = fonteMenu.render("Jogar novamente", True, preto)
+        if ptbr:
+            startTexto = fonteMenu.render("Jogar novamente", True, preto) 
+        else:
+            startTexto = fonteMenu.render("Play Again", True, preto)
         tela.blit(startTexto, (400,440))
         
         quitButton = pygame.draw.rect(tela, branco, (325,510, larguraButtonQuit, alturaButtonQuit), border_radius=15)
-        quitTexto = fonteMenu.render("Sair do Game", True, preto)
-        tela.blit(quitTexto, (410,540))
+        if ptbr:
+            quitTexto = fonteMenu.render("Sair do Jogo", True, preto) 
+        else:
+            quitTexto = fonteMenu.render("Quit Game", True, preto)
+        tela.blit(quitTexto, (410,545))
 
 
         pygame.display.update()

@@ -9,6 +9,7 @@ def falar(texto, nome):
     threading.Thread(target=executarFala, daemon=True).start()
 
 def ouvir():
+    global falaResultado
     recognizer = controladorVoz.Recognizer()
     with controladorVoz.Microphone() as source:
         print("Diga Algo...")
@@ -16,10 +17,9 @@ def ouvir():
         recognizer.adjust_for_ambient_noise(source)
         audio = recognizer.listen(source)
         try:
-            texto = recognizer.recognize_google(audio, language='pt-BR')
-            print(f"Você disse: {texto}")
-            return texto
+            falaResultado = recognizer.recognize_google(audio, language='pt-BR')
+            print(f"Você disse: {falaResultado}")
         except controladorVoz.UnknownValueError:
-            return print("Não consegui entender o que você disse.")
+            falaResultado = ""
         except controladorVoz.RequestError:
-            return print("Erro ao se conectar com o servidor!")
+            falaResultado = ""
