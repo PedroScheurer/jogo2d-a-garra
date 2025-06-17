@@ -12,14 +12,20 @@ def ouvir():
     global falaResultado
     recognizer = controladorVoz.Recognizer()
     with controladorVoz.Microphone() as source:
-        print("Diga Algo...")
-        print("Fique em silêncio para finalizar!")
         recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source)
-        try:
-            falaResultado = recognizer.recognize_google(audio, language='pt-BR')
-            print(f"Você disse: {falaResultado}")
-        except controladorVoz.UnknownValueError:
-            falaResultado = ""
-        except controladorVoz.RequestError:
-            falaResultado = ""
+
+        while True:
+            try:
+                print("[OUVIR] Aguardando fala...")
+                audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
+                fala = recognizer.recognize_google(audio, language='pt-BR')
+                print(f"[OUVIR] Você disse: {fala}")
+                falaResultado = fala.lower()
+            except controladorVoz.UnknownValueError:
+                print("[OUVIR] Não entendi o que foi dito.")
+                falaResultado = ""
+            except controladorVoz.RequestError:
+                print("[OUVIR] Erro ao acessar o serviço de reconhecimento.")
+                falaResultado = ""
+            except Exception as e:
+                print(f"[OUVIR] Erro inesperado: {e}")

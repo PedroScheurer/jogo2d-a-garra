@@ -14,7 +14,7 @@ tamanho = (1000,700)
 relogio = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho) 
 pygame.display.set_caption("A Garra")
-icone  = pygame.image.load("recursos/ursinho_dourado.png")
+icone  = pygame.image.load("recursos/icoUrsinho_dourado.ico")
 pygame.display.set_icon(icone)
 branco = (255,255,255)
 preto = (0, 0 ,0 )
@@ -24,7 +24,6 @@ fundoJogo = pygame.image.load("recursos/telaJogo.png")
 fundoPerdeu = pygame.image.load("recursos/telaPerdeu.png")
 maquinaCima = pygame.image.load("recursos/telaJogoMaquinaCima.png")
 joyStick = pygame.image.load("recursos/telaJoySticksemfundo.png")
-fundoPause = pygame.image.load("recursos/paused.png")
 buracoUrso = pygame.image.load("recursos/buracoUrso.png")
 engrenagem = pygame.image.load("recursos/engrenagemSemfundo.png").convert_alpha()
 somCaptura = pygame.mixer.Sound("recursos/pickup_2.wav")
@@ -118,9 +117,9 @@ def jogar():
     ursosVogaisPegos = []
     ursosConsoantesPegos = []
 
-    urso_img = pygame.image.load("recursos/ursinho_dourado.png").convert_alpha()
+    ursoDourado = pygame.image.load("recursos/ursinho_dourado.png").convert_alpha()
     tamanho = 36
-    urso_img = pygame.transform.scale(urso_img, (tamanho, tamanho))
+    ursoDourado = pygame.transform.scale(ursoDourado, (tamanho, tamanho))
 
     ursoAleatorioXMin = 750
     ursoAleatorioXMax = 900
@@ -133,8 +132,8 @@ def jogar():
 
     # Direção de movimento aleatória
     velocidade = 0.5
-    dx = random.uniform(-1, 1)
-    dy = random.uniform(-1, 1)
+    direcaoAleatoriaX = random.uniform(-1, 1)
+    direcaoAleatoriaY = random.uniform(-1, 1)
 
 
     # Temporizador para trocar a direção
@@ -143,7 +142,7 @@ def jogar():
 
     angulo = 0
     tempo = 0
-    raio_base = 64
+    raioBase = 64
 
     while True:
         eventos = pygame.event.get()
@@ -173,6 +172,10 @@ def jogar():
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
                 pause = True
                 while pause:
+                    if ptbr:
+                        fundoPause = pygame.image.load("recursos/pausado.png")
+                    else:
+                        fundoPause = pygame.image.load("recursos/paused.png")
                     tela.blit(fundoPause, (0,0))
                     pygame.display.update()
         
@@ -216,7 +219,7 @@ def jogar():
         else:
             texto = fontePontos.render("Points: "+str(pontos), True, branco)
 
-        tela.blit(texto, (470,65))
+        tela.blit(texto, (400,55))
         if ptbr:
             texto = fonteMenu.render("Pressione Espaço para Pausar o Jogo", True, branco) 
         else: 
@@ -226,7 +229,6 @@ def jogar():
         
         garraRect = pygame.Rect(posicaoXGarra, posicaoYGarra, larguraGarra, alturaGarra)
 
-        
         for nomeUrso, dadosUrso in ursos.items():
             ursoRect = pygame.Rect(dadosUrso[1], dadosUrso[2], larguraUrso, alturaUrso)    
         
@@ -268,18 +270,18 @@ def jogar():
             escreverDados(nome, pontos)
             perdeu()
 
-        if len(ursosVogaisPegos) == 1:
+        if len(ursosVogaisPegos) == 5:
             print("vitoria")
             telaVitoria()
 
         # Mover o ursinho
-        x += dx * velocidade
-        y += dy * velocidade
+        x += direcaoAleatoriaX * velocidade
+        y += direcaoAleatoriaY * velocidade
 
         if x < ursoAleatorioXMin or x > ursoAleatorioXMax:
-            dx *= -1
+            direcaoAleatoriaX *= -1
         if y < ursoAleatorioYMin or y > ursoAleatorioYMax:
-            dy *= -1
+            direcaoAleatoriaY *= -1
 
         # Trocar direção a cada intervalo de tempo
         agora = pygame.time.get_ticks()
@@ -288,31 +290,32 @@ def jogar():
             dy = random.uniform(-1, 1)
             ultimo_tempo = agora
 
-        # Desenhar o ursinho na tela
-        tela.blit(urso_img, (int(x - tamanho // 2), int(y - tamanho // 2)))
+        tela.blit(ursoDourado, (int(x - tamanho // 2), int(y - tamanho // 2)))
 
 
         # Atualiza o ângulo e o fator de escala (pulsação)
         angulo += 0.75
         tempo += 0.05
         escala = 1 + 0.1 * math.sin(tempo)  # Efeito de pulsar
-        tamanho = int(raio_base * 2 * escala)
+        tamanho = int(raioBase * 2 * escala)
         
         # Redimensiona e rotaciona a imagem
-        engrenagem_escalada = pygame.transform.smoothscale(engrenagem, (tamanho, tamanho))
-        engrenagem_rotacionada = pygame.transform.rotate(engrenagem_escalada, angulo)
+        engrenagemEscalada = pygame.transform.smoothscale(engrenagem, (tamanho, tamanho))
+        engrenagemRotacionada = pygame.transform.rotate(engrenagemEscalada, angulo)
 
-        # Calcula posição para o canto superior direito
-        engrenagem_rect = engrenagem_rotacionada.get_rect(topright=(1050, -50))
+        engrenagemRect = engrenagemRotacionada.get_rect(topright=(1050, -50))
 
-        tela.blit(engrenagem_rotacionada, engrenagem_rect)
+        tela.blit(engrenagemRotacionada, engrenagemRect)
 
         pygame.display.update()
         relogio.tick(60)
 
 
 def telaVitoria():
-    fundoVitoria = pygame.image.load("recursos/telaVitoria.png")
+    if ptbr:
+        fundoVitoria = pygame.image.load("recursos/telaVitoria.png")
+    else:
+        fundoVitoria = pygame.image.load("recursos/telaVictory.png")
     textoVitoria = fonteNome.render(f"{nome}", True, branco)
 
     larguraButtonStart = 350
@@ -372,7 +375,10 @@ def telaVitoria():
 
 def telaBoasVindas():
     # Carregar fundo da tela de boas-vindas
-    fundoBoasVindas = pygame.image.load("recursos/telaBoasVindas.png")
+    if ptbr:
+        fundoBoasVindas = pygame.image.load("recursos/telaBoasVindas.png")
+    else:
+        fundoBoasVindas = pygame.image.load("recursos/telaWelcome.png")
     textoBemVindo = fonteNome.render(f"{nome}", True, branco)
     falar("Bem vindo", nome) if ptbr else falar("Welcome", nome)
 
@@ -392,7 +398,7 @@ def telaBoasVindas():
 
 
 def start():
-    global ptbr
+    global ptbr, falaResultado
     ptbr = True
     def botoes(caminhoButtonPlay, caminhoButtonQuit):
             global startRect, quitRect, botaoPtBrRect, botaoEnUsRect
@@ -412,7 +418,7 @@ def start():
             botaoEnUsRect = botaoEnUs.get_rect(topleft=(800,115))
             tela.blit(botaoEnUs,(800,115))    
 
-    thread_voz = threading.Thread(target=ouvir)
+    thread_voz = threading.Thread(target=ouvir, daemon=True)
     thread_voz.start()
 
     larguraButtonStart = 355
@@ -475,17 +481,20 @@ def start():
                     larguraButtonEnUs = 150
                     alturaButtonEnUs = 81
                     ptbr = False
-                else:
-                    if falaResultado:
-                        if "começar" in falaResultado or "iniciar" in falaResultado or "start" in falaResultado:
-                            pygame.mixer.music.play(-1)
-                            pygame.mixer.Sound.play(somClique)
-                            jogar()
-                        elif "sair" in falaResultado or "fechar" in falaResultado or "quit" in falaResultado:
-                            pygame.mixer.music.play(-1)
-                            pygame.mixer.Sound.play(somClique)
-                            quit()
-                        falaResultado = None
+
+        if falaResultado:
+            fala = falaResultado.strip().lower()
+            print(f"[DEBUG TESTE] falaResultado atual: {fala}")
+            falaResultado = None
+            if "começar" in fala or "iniciar" in fala:
+                pygame.mixer.music.play(-1)
+                pygame.mixer.Sound.play(somClique)
+                jogar()
+            elif "sair" in fala or "fechar" in fala:
+                pygame.mixer.music.play(-1)
+                pygame.mixer.Sound.play(somClique)
+                quit()
+            falaResultado = None
 
 
 def perdeu():
