@@ -6,6 +6,7 @@ from recursos.funcoes import escreverDados
 from recursos.funcoesVoz import ouvir
 from recursos.funcoesVoz import falar
 import json
+from queue import Queue
 
 
 pygame.init()
@@ -38,6 +39,8 @@ pygame.mixer.music.set_volume(0.25)
 pygame.mixer.music.load("recursos/Boppy1minloop.mp3")
 nomeDigitado = False
 falaResultado = None
+fila_falas = Queue()
+
 
 
 def jogar():
@@ -398,6 +401,7 @@ def telaBoasVindas():
 
 
 def start():
+    import threading
     global ptbr, falaResultado
     ptbr = True
     def botoes(caminhoButtonPlay, caminhoButtonQuit):
@@ -482,19 +486,19 @@ def start():
                     alturaButtonEnUs = 81
                     ptbr = False
 
-        if falaResultado:
-            fala = falaResultado.strip().lower()
-            print(f"[DEBUG TESTE] falaResultado atual: {fala}")
-            falaResultado = None
-            if "começar" in fala or "iniciar" in fala:
+        if not fila_falas.empty():
+            fala = fila_falas.get().strip().lower()
+            print(f"[DEBUG TESTE] Fala recebida da fila: {fala}")
+
+            if any(p in fala for p in ["começar", "iniciar", "jogar"]):
                 pygame.mixer.music.play(-1)
                 pygame.mixer.Sound.play(somClique)
                 jogar()
-            elif "sair" in fala or "fechar" in fala:
+            elif any(p in fala for p in ["sair", "fechar", "encerrar"]):
                 pygame.mixer.music.play(-1)
                 pygame.mixer.Sound.play(somClique)
                 quit()
-            falaResultado = None
+
 
 
 def perdeu():
