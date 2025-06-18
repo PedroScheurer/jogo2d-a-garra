@@ -7,6 +7,7 @@ from recursos.funcoesVoz import ouvir
 from recursos.funcoesVoz import falar
 import json
 from queue import Queue
+import sys
 
 
 pygame.init()
@@ -151,7 +152,7 @@ def jogar():
         eventos = pygame.event.get()
         for evento in eventos:
             if evento.type == pygame.QUIT:
-                quit()
+                sys.exit()
             elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_RIGHT:
                 movimentoXGarra = 2
                 movimentoYGarra = 0
@@ -186,6 +187,7 @@ def jogar():
                         if eventoPausa.type == pygame.QUIT:
                             pygame.quit()
                             exit()
+                            sys.exit()
                         elif eventoPausa.type == pygame.KEYDOWN and eventoPausa.key == pygame.K_SPACE:
                             pause = False
 
@@ -239,6 +241,7 @@ def jogar():
                 if eventoAgarrar.type == pygame.QUIT:
                     pygame.quit()
                     exit()
+                    sys.exit()
                 
                 elif eventoAgarrar.type == pygame.KEYDOWN and eventoAgarrar.key == pygame.K_RETURN: 
                     if garraRect.colliderect(ursoRect):
@@ -333,7 +336,7 @@ def telaVitoria():
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                quit()
+                sys.exit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 if startButton.collidepoint(evento.pos):
                     larguraButtonStart = 350
@@ -353,7 +356,8 @@ def telaVitoria():
                     pygame.mixer.music.play(-1)
                     larguraButtonQuit = 350
                     alturaButtonQuit  = 100
-                    quit()
+                    sys.exit()
+
 
 
         startButton = pygame.draw.rect(tela, branco, (325,400, larguraButtonStart, alturaButtonStart), border_radius=15)
@@ -392,7 +396,7 @@ def telaBoasVindas():
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                quit()
+                sys.exit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 jogar()
 
@@ -402,7 +406,7 @@ def telaBoasVindas():
 
 def start():
     import threading
-    global ptbr, falaResultado
+    global ptbr
     ptbr = True
     def botoes(caminhoButtonPlay, caminhoButtonQuit):
             global startRect, quitRect, botaoPtBrRect, botaoEnUsRect
@@ -448,7 +452,7 @@ def start():
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                quit()
+                sys.exit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 if startRect.collidepoint(evento.pos):
                     larguraButtonStart = 355
@@ -476,7 +480,7 @@ def start():
                     larguraButtonQuit = 330
                     alturaButtonQuit  = 110
                     pygame.mixer.Sound.play(somClique)
-                    quit()
+                    sys.exit()
                 elif botaoPtBrRect.collidepoint(evento.pos):
                     larguraButtonPtBr = 150
                     alturaButtonPtBr = 84
@@ -495,7 +499,7 @@ def start():
             elif any(p in fala for p in ["sair", "fechar", "encerrar"]):
                 pygame.mixer.music.play(-1)
                 pygame.mixer.Sound.play(somClique)
-                quit()
+                sys.exit()
 
 
 
@@ -526,7 +530,7 @@ def perdeu():
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                quit()
+                sys.exit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 if startButton.collidepoint(evento.pos):
                     larguraButtonStart = 350
@@ -547,7 +551,7 @@ def perdeu():
                     pygame.mixer.music.play(-1)
                     larguraButtonQuit = 350
                     alturaButtonQuit  = 100
-                    quit()
+                    sys.exit()
                     
         
         tela.blit(fundoPerdeu, (0,0))
